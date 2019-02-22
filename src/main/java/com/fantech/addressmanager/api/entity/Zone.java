@@ -19,7 +19,6 @@ public class Zone extends Resource {
     private double longitude;
 
     @ManyToOne
-//    @JoinColumn(name="uuid")
     private User user;
 
     @OneToMany(mappedBy = "zone")
@@ -27,7 +26,6 @@ public class Zone extends Resource {
 
     public Zone() {
     }
-
 
     public String getName() {
         return name;

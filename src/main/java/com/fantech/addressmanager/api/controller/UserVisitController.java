@@ -7,17 +7,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/visits")
-public class VisitController {
+@RequestMapping("/users/{userUuid}/visits")
+public class UserVisitController {
 
     private final VisitService visitService;
 
     @Autowired
-    public VisitController(VisitService visitService) {
+    public UserVisitController(VisitService visitService) {
         this.visitService = visitService;
+    }
+
+    @GetMapping
+    public List findAll(@PathVariable("userUuid") String userUuid) {
+        return visitService.findUserVisits(userUuid);
     }
 
     @PostMapping("/create")
@@ -25,19 +31,13 @@ public class VisitController {
         return visitService.createVisit(visitDto);
     }
 
-    @GetMapping("/{uuid}")
-    public Visit getVisit(@PathVariable("uuid") UUID uuid){
-        return null;
-    }
-
     @PatchMapping
-    public Visit updateVisit(Visit visit){
-
+    public Visit updateVisit(Visit visit) {
         return null;
     }
 
     @DeleteMapping("{uuid}")
-    public void deleteVisit(@PathVariable("uuid") UUID uuid){
+    public void deleteVisit(@PathVariable("uuid") UUID uuid) {
 
     }
 }

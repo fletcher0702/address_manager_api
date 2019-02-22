@@ -3,7 +3,6 @@ package com.fantech.addressmanager.api.entity;
 import com.fantech.addressmanager.api.entity.common.Resource;
 
 import javax.persistence.*;
-//import javax.persistence.ManyToOne;
 
 
 @Entity
@@ -16,8 +15,6 @@ public class Visit extends Resource {
     private String address;
     @Column(name="phone_number")
     private String phoneNumber;
-//    @Column(name="zone_id")
-//    private String zoneId;
     @Column(name="status")
     private String status;
     @Column(name="latitude")
@@ -36,6 +33,30 @@ public class Visit extends Resource {
         this.name = name;
         this.address = address;
         this.status = status;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
     }
 
     public void setName(String name) {
