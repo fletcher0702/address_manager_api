@@ -21,6 +21,13 @@ public class User extends Resource {
     @OneToMany(mappedBy = "user")
     private Set<Zone> zones;
 
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "user_team",
+        joinColumns = {@JoinColumn(name="user_uuid")},
+            inverseJoinColumns = {@JoinColumn(name="team_uuid")}
+    )
+    private Set<Team> teams;
+
     public User(){
 
     }
