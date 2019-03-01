@@ -1,16 +1,14 @@
 package com.fantech.addressmanager.api.dao;
 
 import com.fantech.addressmanager.api.entity.User;
-import com.fantech.addressmanager.api.helpers.AuthHelper;
+import com.fantech.addressmanager.api.helpers.AuthService;
 import com.fantech.addressmanager.api.util.HibernateUtilConfiguration;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 @Repository
@@ -29,7 +27,7 @@ public class UserDAO extends DAO<User> {
         if (userFound != null) {
             return false;
         }
-        user.setPassword(AuthHelper.hashPassword(user.getPassword()));
+        user.setPassword(AuthService.hashPassword(user.getPassword()));
         save(user);
 
         return true;
