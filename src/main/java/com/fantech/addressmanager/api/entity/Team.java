@@ -20,4 +20,11 @@ public class Team extends Resource {
     @ManyToMany(mappedBy = "teams")
     private Set<User> users;
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setAdminUuid(UUID adminUuid) {
+        this.adminUuid = adminUuid;
+    }
 }
