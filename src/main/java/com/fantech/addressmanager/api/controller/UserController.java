@@ -1,11 +1,11 @@
 package com.fantech.addressmanager.api.controller;
 
-import com.eclipsesource.json.JsonObject;
 import com.fantech.addressmanager.api.dto.user.UserDto;
 import com.fantech.addressmanager.api.services.UserService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,6 +34,11 @@ public class UserController {
     @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE)
     public Map login(@RequestBody UserDto user) {
         return userService.login(user);
+    }
+
+    @GetMapping("/checktoken")
+    public Object checkJwtIntegrity(@RequestHeader HttpHeaders headers){
+        return userService.checkJwtIntegrity(headers);
     }
 
     @GetMapping("")
