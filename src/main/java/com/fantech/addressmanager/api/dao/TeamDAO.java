@@ -1,6 +1,7 @@
 package com.fantech.addressmanager.api.dao;
 
 import com.fantech.addressmanager.api.entity.Team;
+import com.fantech.addressmanager.api.entity.User;
 import com.fantech.addressmanager.api.util.HibernateUtilConfiguration;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
@@ -10,24 +11,24 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
-public class TeamDAO extends DAO {
+public class TeamDAO extends DAO<Team> {
 
     public TeamDAO(HibernateUtilConfiguration hibernateUtilConfiguration) {
         super(hibernateUtilConfiguration);
     }
 
     @Override
-    public boolean create(Object obj) {
+    public boolean create(Team obj) {
         return save(obj);
     }
 
     @Override
-    public boolean delete(Object obj) {
+    public boolean delete(Team obj) {
         return false;
     }
 
     @Override
-    public boolean update(Object obj) {
+    public boolean update(Team obj) {
         return false;
     }
 
@@ -44,7 +45,9 @@ public class TeamDAO extends DAO {
         Query q = session.createQuery(hql);
         q.setParameter("uuid", uuid);
 
-        return (Team) q.uniqueResult();
+        Team t = (Team) q.uniqueResult();
+        session.close();
+        return  t;
     }
 
     public Team findUserTeamByUuid(UUID userUuid, UUID teamUuid){

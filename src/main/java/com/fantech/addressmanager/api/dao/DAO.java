@@ -27,11 +27,21 @@ public abstract class DAO<T> {
      */
     public abstract boolean create(T obj);
 
-    protected boolean save(T obj){
+    public boolean save(T obj){
         Session session = this.sessionFactory.openSession();
         Transaction tx = session.beginTransaction();
         session.save(obj);
         tx.commit();
+        session.close();
+        return true;
+    }
+
+    public boolean updateObj(T obj){
+        Session session = this.sessionFactory.openSession();
+        Transaction tx = session.beginTransaction();
+        session.update(obj);
+        tx.commit();
+        session.close();
         return true;
     }
 

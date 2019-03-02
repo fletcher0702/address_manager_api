@@ -1,9 +1,11 @@
 package com.fantech.addressmanager.api.entity;
 
 import com.fantech.addressmanager.api.entity.common.Resource;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.ManyToMany;
 import java.util.Set;
 import java.util.UUID;
@@ -14,14 +16,19 @@ public class Team extends Resource {
     @Column(name="name")
     private String name;
 
+    @JsonIgnore
     @Column(name="adminUuid",unique = true, nullable = false,updatable = false)
     private UUID adminUuid;
 
-    @ManyToMany(mappedBy = "teams")
+    @ManyToMany(mappedBy = "teams",fetch = FetchType.EAGER)
     private Set<User> users;
 
     public String getName() {
         return name;
+    }
+
+    public UUID getAdminUuid() {
+        return adminUuid;
     }
 
     public Set<User> getUsers() {
@@ -34,5 +41,9 @@ public class Team extends Resource {
 
     public void setAdminUuid(UUID adminUuid) {
         this.adminUuid = adminUuid;
+    }
+
+    public void setUsers(Set<User> users) {
+        this.users = users;
     }
 }

@@ -60,7 +60,9 @@ public class UserDAO extends DAO<User> {
         Query q = session.createQuery(hql);
         q.setParameter("uuid", uuid);
 
-        return getUser(q);
+        User u = getUser(q);
+        session.close();
+        return u;
     }
 
 
@@ -70,7 +72,9 @@ public class UserDAO extends DAO<User> {
         String hql = "from User u where u.email=:email";
         Query q = session.createQuery(hql);
         q.setParameter("email", email);
-        return getUser(q);
+        User u =  getUser(q);
+        session.close();
+        return u;
 
     }
 

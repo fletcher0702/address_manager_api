@@ -21,7 +21,7 @@ public class User extends Resource {
     @OneToMany(mappedBy = "user")
     private Set<Zone> zones;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     @JoinTable(name = "user_team",
         joinColumns = {@JoinColumn(name="user_uuid")},
             inverseJoinColumns = {@JoinColumn(name="team_uuid")}
@@ -49,6 +49,15 @@ public class User extends Resource {
 
     public String getPassword() {
         return password;
+    }
+
+    @JsonIgnore
+    public Set<Team> getTeams() {
+        return teams;
+    }
+
+    public void setTeams(Set<Team> teams) {
+        this.teams = teams;
     }
 
     public void setPassword(String password) {

@@ -1,5 +1,6 @@
 package com.fantech.addressmanager.api.controller;
 
+import com.fantech.addressmanager.api.dto.team.InviteUsersDto;
 import com.fantech.addressmanager.api.dto.team.TeamDto;
 import com.fantech.addressmanager.api.services.TeamService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,13 @@ public class UserTeamController {
     @GetMapping("/{userUuid}/teams/{teamUuid}")
     public Object findUserTeam(@PathVariable("userUuid") String userUuid, @PathVariable("teamUuid") String teamUuid){
         return teamService.findOneByUuid(userUuid, teamUuid);
+    }
+
+    @PostMapping("/teams/invite")
+    public Object addUsersInTeam(@RequestBody InviteUsersDto inviteUsersDto){
+
+        System.out.println(inviteUsersDto);
+        return teamService.addUsersInTeam(inviteUsersDto);
     }
 
 }
