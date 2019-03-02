@@ -20,6 +20,14 @@ public class Team extends Resource {
     @ManyToMany(mappedBy = "teams")
     private Set<User> users;
 
+    public String getName() {
+        return name;
+    }
+
+    public Set<User> getUsers() {
+        return users;
+    }
+
     public void setName(String name) {
         this.name = name;
     }

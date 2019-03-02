@@ -3,10 +3,7 @@ package com.fantech.addressmanager.api.controller;
 import com.fantech.addressmanager.api.dto.team.TeamDto;
 import com.fantech.addressmanager.api.services.TeamService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/users")
@@ -22,6 +19,12 @@ public class UserTeamController {
     @PostMapping("/teams/create")
     public Object createOne(@RequestBody TeamDto teamDto){
         return teamService.createTeam(teamDto);
+    }
+
+
+    @GetMapping("/{userUuid}/teams/{teamUuid}")
+    public Object findUserTeam(@PathVariable("userUuid") String userUuid, @PathVariable("teamUuid") String teamUuid){
+        return teamService.findOneByUuid(userUuid, teamUuid);
     }
 
 }

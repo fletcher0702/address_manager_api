@@ -44,4 +44,11 @@ public class TeamService {
         return HttpStatus.BAD_REQUEST;
     }
 
+    public Object findOneByUuid(String userUuid,String teamUuid){
+
+        Team team = teamDAO.findUserTeamByUuid(UUID.fromString(userUuid),UUID.fromString(teamUuid));
+        if(team!=null) return team;
+        return HttpStatus.NOT_FOUND;
+    }
+
 }

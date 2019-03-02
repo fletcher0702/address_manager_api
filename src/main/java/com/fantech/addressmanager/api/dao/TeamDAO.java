@@ -1,6 +1,9 @@
 package com.fantech.addressmanager.api.dao;
 
+import com.fantech.addressmanager.api.entity.Team;
 import com.fantech.addressmanager.api.util.HibernateUtilConfiguration;
+import org.hibernate.Session;
+import org.hibernate.query.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -34,7 +37,24 @@ public class TeamDAO extends DAO {
     }
 
     @Override
-    public Object findByUuid(UUID uuid) {
-        return null;
+    public Team findByUuid(UUID uuid) {
+
+        Session session = this.sessionFactory.openSession();
+        String hql = "from Team t where t.uuid = :uuid";
+        Query q = session.createQuery(hql);
+        q.setParameter("uuid", uuid);
+
+        return (Team) q.uniqueResult();
+    }
+
+    public Team findUserTeamByUuid(UUID userUuid, UUID teamUuid){
+        Session session = this.sessionFactory.openSession();
+        String hql = "from Team t where t.adminUuid =: userUuid and t.uuid = :teamUuid";
+        Query q = session.createQuery(hql);
+        q.setParameter("userUuid", userUuid);
+        q.setParameter("teamUuid", teamUuid);
+
+        return (Team) q.uniqueResult();
+
     }
 }
