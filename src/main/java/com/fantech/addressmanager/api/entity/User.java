@@ -18,9 +18,6 @@ public class User extends Resource {
     @Column(name="password")
     private String password;
 
-    @OneToMany(mappedBy = "user")
-    private Set<Zone> zones;
-
     @ManyToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     @JoinTable(name = "user_team",
         joinColumns = {@JoinColumn(name="user_uuid")},
@@ -37,14 +34,8 @@ public class User extends Resource {
         this.password = password;
     }
 
-
-
     public String getEmail() {
         return email;
-    }
-
-    public Set<Zone> getZones() {
-        return zones;
     }
 
     public String getPassword() {

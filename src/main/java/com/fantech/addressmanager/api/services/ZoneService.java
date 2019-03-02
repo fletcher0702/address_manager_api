@@ -1,9 +1,9 @@
 package com.fantech.addressmanager.api.services;
 
-import com.fantech.addressmanager.api.dao.UserDAO;
+import com.fantech.addressmanager.api.dao.TeamDAO;
 import com.fantech.addressmanager.api.dao.ZoneDAO;
-import com.fantech.addressmanager.api.dto.zone.ZoneDto;
-import com.fantech.addressmanager.api.entity.User;
+import com.fantech.addressmanager.api.dto.zone.CreateZoneDto;
+import com.fantech.addressmanager.api.entity.Team;
 import com.fantech.addressmanager.api.entity.Zone;
 import com.fantech.addressmanager.api.entity.common.Coordinates;
 import com.fantech.addressmanager.api.helpers.AddressHelper;
@@ -18,33 +18,33 @@ import java.util.UUID;
 public class ZoneService {
 
     private ZoneDAO zoneDAO;
-    private UserDAO userDAO;
+    private TeamDAO teamDAO;
     private AddressHelper addressHelper;
 
     @Autowired
-    public ZoneService(ZoneDAO zoneDAO, UserDAO userDAO, AddressHelper addressHelper) {
+    public ZoneService(ZoneDAO zoneDAO, TeamDAO teamDAO, AddressHelper addressHelper) {
         this.zoneDAO = zoneDAO;
-        this.userDAO = userDAO;
+        this.teamDAO = teamDAO;
         this.addressHelper = addressHelper;
     }
 
-    public Zone createZone(ZoneDto zoneDto) throws IOException {
+    public Zone createZone(CreateZoneDto createZoneDto) throws IOException {
 
-        if (zoneDto.getAddress() != null && zoneDto.getName() != null && zoneDto.getUserUuid() != null) {
+        if (createZoneDto.getAddress() != null && createZoneDto.getName() != null && createZoneDto.getTeamUuid() != null) {
 
             System.out.println("All Credentials presents...");
-            System.out.println(zoneDto.getUserUuid());
-            User user = userDAO.findByUuid(UUID.fromString(zoneDto.getUserUuid()));
+            System.out.println(createZoneDto.getTeamUuid());
+            Team team = teamDAO.findByUuid(UUID.fromString(createZoneDto.getTeamUuid()));
 
-            if (user != null) {
+            if (team != null) {
 
-                System.out.println("Related User found...");
+                System.out.println("Related Team found...");
                 Zone zone = new Zone();
-                Coordinates coordinates = addressHelper.getCoordinates(zoneDto.getAddress());
-                zone.setName(zoneDto.getName());
+                Coordinates coordinates = addressHelper.getCoordinates(createZoneDto.getAddress());
+                zone.setName(createZoneDto.getName());
                 zone.setLatitude(coordinates.getLat());
                 zone.setLongitude(coordinates.getLng());
-                zone.setUser(user);
+                zone.setTeam(team);
                 zoneDAO.create(zone);
                 return zone;
             }
@@ -59,13 +59,13 @@ public class ZoneService {
         return  zoneDAO.findAll();
     }
 
-    public List findAllByUserUuid(String userUuid){
+    public List findAllByUserUuid(String teamUuid){
 
-        User user = userDAO.findByUuid(UUID.fromString(userUuid));
+        Team team = teamDAO.findByUuid(UUID.fromString(teamUuid));
 
-        if(user!=null){
-            System.out.println("User found, looking for zones...");
-            return zoneDAO.findAllByUserUuid(UUID.fromString(userUuid));
+        if(team!=null){
+            System.out.println("Team found, looking for zones...");
+            return zoneDAO.findAllByUserUuid(UUID.fromString(teamUuid));
         }
 
         System.out.println("Zone(s) not found...");
@@ -74,11 +74,11 @@ public class ZoneService {
 
     public Zone findUserZoneByUuid(String userUuid, String zoneUuid){
 
-        User user = userDAO.findByUuid(UUID.fromString(userUuid));
+        Team team = teamDAO.findByUuid(UUID.fromString(userUuid));
 
-        if(user!=null){
+        if(team!=null){
 
-            return zoneDAO.findUserZoneByUuid(user.getUuid(), UUID.fromString(zoneUuid));
+            return zoneDAO.findUserZoneByUuid(team.getUuid(), UUID.fromString(zoneUuid));
         }
         System.out.println("User not found...");
         return null;

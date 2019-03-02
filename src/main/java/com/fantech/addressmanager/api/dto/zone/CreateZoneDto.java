@@ -1,13 +1,13 @@
 package com.fantech.addressmanager.api.dto.zone;
 
-public class ZoneDto {
+public class CreateZoneDto {
 
-    private String userUuid;
+    private String teamUuid;
     private String name;
     private String address;
 
-    public ZoneDto(String userUuid,String name, String address) {
-        this.userUuid = userUuid;
+    public CreateZoneDto(String teamUuid, String name, String address) {
+        this.teamUuid = teamUuid;
         this.name = name;
         this.address = address;
     }
@@ -20,7 +20,7 @@ public class ZoneDto {
         return address;
     }
 
-    public String getUserUuid() {
-        return userUuid;
+    public String getTeamUuid() {
+        return teamUuid;
     }
 }

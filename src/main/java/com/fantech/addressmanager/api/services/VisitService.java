@@ -1,10 +1,10 @@
 package com.fantech.addressmanager.api.services;
 
-import com.fantech.addressmanager.api.dao.UserDAO;
+import com.fantech.addressmanager.api.dao.TeamDAO;
 import com.fantech.addressmanager.api.dao.VisitDAO;
 import com.fantech.addressmanager.api.dao.ZoneDAO;
 import com.fantech.addressmanager.api.dto.visit.VisitDto;
-import com.fantech.addressmanager.api.entity.User;
+import com.fantech.addressmanager.api.entity.Team;
 import com.fantech.addressmanager.api.entity.Visit;
 import com.fantech.addressmanager.api.entity.Zone;
 import com.fantech.addressmanager.api.entity.common.Coordinates;
@@ -20,14 +20,14 @@ import java.util.UUID;
 @Service
 public class VisitService {
 
-    private UserDAO userDAO;
+    private TeamDAO teamDAO;
     private VisitDAO visitDAO;
     private ZoneDAO zoneDAO;
     private AddressHelper addressHelper;
 
     @Autowired
-    public VisitService(UserDAO userDAO, VisitDAO visitDAO, ZoneDAO zoneDAO, AddressHelper addressHelper) {
-        this.userDAO = userDAO;
+    public VisitService(TeamDAO teamDAO, VisitDAO visitDAO, ZoneDAO zoneDAO, AddressHelper addressHelper) {
+        this.teamDAO = teamDAO;
         this.visitDAO = visitDAO;
         this.zoneDAO = zoneDAO;
         this.addressHelper = addressHelper;
@@ -38,9 +38,9 @@ public class VisitService {
 
         if (visitDto.getName() != null && visitDto.getAddress() != null && visitDto.getStatus() != null && visitDto.getZoneUuid() != null && visitDto.getZoneUuid() != null) {
 
-            User user = userDAO.findByUuid(UUID.fromString(visitDto.getUserUuid()));
+            Team team = teamDAO.findByUuid(UUID.fromString(visitDto.getTeamUuid()));
 
-            if (user != null) {
+            if (team != null) {
 
                 Zone zone = zoneDAO.findByUuid(UUID.fromString(visitDto.getZoneUuid()));
 
@@ -52,6 +52,7 @@ public class VisitService {
                     visit.setAddress(visitDto.getAddress());
                     visit.setStatus(visitDto.getStatus());
                     visit.setPhoneNumber(visitDto.getPhoneNumber());
+                    zone.setTeam(team);
                     visit.setZone(zone);
                     visit.setLatitude(coordinates.getLat());
                     visit.setLongitude(coordinates.getLng());
@@ -66,16 +67,14 @@ public class VisitService {
         return null;
     }
 
-    public List findUserVisits(String userUuid){
+    public List findTeamVisits(String teamUuid) {
 
-        UUID uuid = UUID.fromString(userUuid);
-        User user = userDAO.findByUuid(uuid);
+        UUID uuid = UUID.fromString(teamUuid);
+        Team team = teamDAO.findByUuid(uuid);
 
-        if(user!=null){
+        if (team != null) {
             return visitDAO.findUserVisits(uuid);
         }
         return null;
     }
-
-//    public Visit findVisitByVis
 }

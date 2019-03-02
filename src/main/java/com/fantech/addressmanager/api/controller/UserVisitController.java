@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/users/{userUuid}/visits")
+@RequestMapping("/users")
 public class UserVisitController {
 
     private final VisitService visitService;
@@ -21,12 +21,12 @@ public class UserVisitController {
         this.visitService = visitService;
     }
 
-    @GetMapping
-    public List findAll(@PathVariable("userUuid") String userUuid) {
-        return visitService.findUserVisits(userUuid);
+    @GetMapping("/{teamUuid}/visits")
+    public List findAll(@PathVariable("teamUuid") String userUuid) {
+        return visitService.findTeamVisits(userUuid);
     }
 
-    @PostMapping("/create")
+    @PostMapping("/teams/visits/create")
     public Visit createVisit(@RequestBody VisitDto visitDto) throws IOException {
         return visitService.createVisit(visitDto);
     }

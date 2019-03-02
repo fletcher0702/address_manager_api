@@ -19,7 +19,7 @@ public class Zone extends Resource {
     private double longitude;
 
     @ManyToOne
-    private User user;
+    private Team team;
 
     @OneToMany(mappedBy = "zone")
     private Set<Visit> visits;
@@ -55,7 +55,7 @@ public class Zone extends Resource {
         this.longitude = longitude;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setTeam(Team team) {
+        this.team = team;
     }
 }

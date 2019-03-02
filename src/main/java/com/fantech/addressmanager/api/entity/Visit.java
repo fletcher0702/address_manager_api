@@ -25,16 +25,6 @@ public class Visit extends Resource {
     @ManyToOne
     private Zone zone;
 
-    public Visit(){
-
-    }
-
-    public Visit(String name, String address,String status) {
-        this.name = name;
-        this.address = address;
-        this.status = status;
-    }
-
     public String getName() {
         return name;
     }
