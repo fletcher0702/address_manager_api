@@ -85,6 +85,11 @@ public class TeamService {
         return null;
     }
 
+    public Object findAllTeamByUserUuid(String userUuid){
+
+        return teamDAO.findUserRelatedTeam(UUID.fromString(userUuid));
+    }
+
     private boolean elligible() {
 
         return false;
