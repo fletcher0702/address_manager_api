@@ -28,6 +28,11 @@ public class UserTeamController {
         return teamService.findOneByUuid(userUuid, teamUuid);
     }
 
+    @GetMapping("/{userUuid}/teams")
+    public Object findAllUserTeam(@PathVariable("userUuid") String userUuid){
+        return teamService.findAllTeamByUserUuid(userUuid);
+    }
+
     @PostMapping("/teams/invite")
     public Object addUsersInTeam(@RequestBody InviteUsersDto inviteUsersDto){
 

@@ -14,7 +14,7 @@ public class Team extends Resource {
     private String name;
 
     @JsonIgnore
-    @Column(name="adminUuid",unique = true, nullable = false,updatable = false)
+    @Column(name="adminUuid",nullable = false,updatable = false)
     private UUID adminUuid;
 
     @OneToMany(mappedBy = "team")
