@@ -3,6 +3,7 @@ package com.fantech.addressmanager.api.services;
 import com.fantech.addressmanager.api.dao.TeamDAO;
 import com.fantech.addressmanager.api.dao.VisitDAO;
 import com.fantech.addressmanager.api.dao.ZoneDAO;
+import com.fantech.addressmanager.api.dto.visit.DeleteVisitDto;
 import com.fantech.addressmanager.api.dto.visit.VisitDto;
 import com.fantech.addressmanager.api.entity.Team;
 import com.fantech.addressmanager.api.entity.Visit;
@@ -13,7 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @SuppressWarnings("Duplicates")
@@ -77,4 +80,40 @@ public class VisitService {
         }
         return null;
     }
+
+    public Object deleteVisitByUuid(DeleteVisitDto visitDto){
+
+        HashMap<String,Boolean> res = new HashMap<>();
+
+        if(!visitDto.getUserUuid().isEmpty()&&!visitDto.getZoneUuid().isEmpty()&&!visitDto.getVisitUuid().isEmpty()){
+
+            System.out.println("mapped data presents...");
+            Zone zone = zoneDAO.findByUuid(UUID.fromString(visitDto.getZoneUuid()));
+
+            if(zone!=null){
+
+                System.out.println("Zone found...");
+
+                if(Objects.equals(zone.getAdminUuid(),UUID.fromString(visitDto.getUserUuid()))){
+
+                    System.out.println("Right owner...");
+
+                    for(Visit v : zone.getVisits()){
+
+                        if(Objects.equals(v.getUuid(),UUID.fromString(visitDto.getVisitUuid()))){
+                            res.put("deleted",visitDAO.deleteByUuid(UUID.fromString(visitDto.getVisitUuid())));
+                            break;
+                        }
+                    }
+
+                    return res;
+
+                }
+            }
+
+        }
+        res.put("deleted",false);
+        return res;
+    }
+    
 }

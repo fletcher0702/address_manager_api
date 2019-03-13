@@ -1,5 +1,6 @@
 package com.fantech.addressmanager.api.controller;
 
+import com.fantech.addressmanager.api.dto.visit.DeleteVisitDto;
 import com.fantech.addressmanager.api.dto.visit.VisitDto;
 import com.fantech.addressmanager.api.entity.Visit;
 import com.fantech.addressmanager.api.services.VisitService;
@@ -36,8 +37,8 @@ public class UserVisitController {
         return null;
     }
 
-    @DeleteMapping("{uuid}")
-    public void deleteVisit(@PathVariable("uuid") UUID uuid) {
-
+    @DeleteMapping("/teams/zones/visits/delete")
+    public Object deleteVisit(@RequestBody DeleteVisitDto visitDto) {
+        return visitService.deleteVisitByUuid(visitDto);
     }
 }

@@ -3,10 +3,12 @@ package com.fantech.addressmanager.api.dao;
 import com.fantech.addressmanager.api.entity.Zone;
 import com.fantech.addressmanager.api.util.HibernateUtilConfiguration;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import javax.persistence.EntityManagerFactory;
 import java.util.List;
 import java.util.UUID;
 
@@ -14,8 +16,8 @@ import java.util.UUID;
 public class ZoneDAO extends DAO<Zone> {
 
     @Autowired
-    public ZoneDAO(HibernateUtilConfiguration hibernateUtilConfiguration) {
-        super(hibernateUtilConfiguration);
+    public ZoneDAO(HibernateUtilConfiguration hibernateUtilConfiguration, EntityManagerFactory entityManagerFactory) {
+        super(hibernateUtilConfiguration, entityManagerFactory);
     }
 
     @Override
@@ -30,6 +32,9 @@ public class ZoneDAO extends DAO<Zone> {
 
     @Override
     public boolean update(Zone obj) {
+        Transaction tx = getSession().beginTransaction();
+        getSession().update(obj);
+        tx.commit();
         return false;
     }
 
@@ -62,11 +67,13 @@ public class ZoneDAO extends DAO<Zone> {
     @Override
     public Zone findByUuid(UUID uuid) {
 
-        Session session = this.sessionFactory.openSession();
+        Session session = getSession();
+
         String hql = "from Zone z where z.uuid = :uuid";
         Query q = session.createQuery(hql);
         q.setParameter("uuid", uuid);
-
-        return (Zone)q.uniqueResult();
+        Zone z = (Zone)q.uniqueResult();
+        session.close();
+        return z;
     }
 }
