@@ -2,6 +2,8 @@ package com.fantech.addressmanager.api.entity;
 
 import com.fantech.addressmanager.api.entity.common.Resource;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import java.util.Set;
@@ -25,9 +27,11 @@ public class Zone extends Resource {
     private double longitude;
 
     @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Team team;
 
     @OneToMany(mappedBy = "zone",orphanRemoval = true,cascade =CascadeType.ALL,fetch = FetchType.EAGER)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<Visit> visits;
 
     public Zone() {

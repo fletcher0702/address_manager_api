@@ -1,5 +1,6 @@
 package com.fantech.addressmanager.api.controller;
 
+import com.fantech.addressmanager.api.dto.team.DeleteTeamDto;
 import com.fantech.addressmanager.api.dto.team.InviteUsersDto;
 import com.fantech.addressmanager.api.dto.team.TeamDto;
 import com.fantech.addressmanager.api.dto.zone.DeleteZoneDto;
@@ -40,13 +41,16 @@ public class UserTeamController {
 
     @PostMapping("/teams/invite")
     public Object addUsersInTeam(@RequestBody InviteUsersDto inviteUsersDto){
-
-        System.out.println(inviteUsersDto);
         return teamService.addUsersInTeam(inviteUsersDto);
     }
 
+    @DeleteMapping("/teams/delete")
+    public Object deleteTeamByUuid(@RequestBody DeleteTeamDto teamDto){
+        return teamService.deleteByUuid(teamDto);
+    }
+
     @DeleteMapping("/teams/zones/delete")
-    public Object deleteOne(@RequestBody DeleteZoneDto zoneDto){
+    public Object deleteZoneByUuid(@RequestBody DeleteZoneDto zoneDto){
         return zoneService.deleteByUuid(zoneDto);
     }
 
