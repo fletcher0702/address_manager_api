@@ -28,12 +28,16 @@ public class ZoneDAO extends DAO<Zone> {
         return save(zone);
     }
 
-    @Transactional
+    @Transactional(value = Transactional.TxType.REQUIRES_NEW)
     @Override
     public boolean delete(Zone z) {
 
         entityManager.joinTransaction();
         assertNotNull(z);
+        Zone zd = entityManager.find(Zone.class,z.getUuid());
+        zd.getVisits().clear();
+        entityManager.persist(zd);
+        entityManager.flush();
         entityManager
                 .createNativeQuery("delete from ZONE where uuid = :zoneUuid ")
                 .setParameter("zoneUuid", z.getUuid())

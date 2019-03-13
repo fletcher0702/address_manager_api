@@ -2,6 +2,7 @@ package com.fantech.addressmanager.api.services;
 
 import com.fantech.addressmanager.api.dao.TeamDAO;
 import com.fantech.addressmanager.api.dao.UserDAO;
+import com.fantech.addressmanager.api.dto.team.DeleteTeamDto;
 import com.fantech.addressmanager.api.dto.team.InviteUsersDto;
 import com.fantech.addressmanager.api.dto.team.TeamDto;
 import com.fantech.addressmanager.api.entity.Team;
@@ -11,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @Service
 public class TeamService {
@@ -92,6 +95,23 @@ public class TeamService {
 
     private boolean elligible() {
 
+        return false;
+    }
+
+    public boolean deleteByUuid(DeleteTeamDto teamDto){
+
+        assertNotNull(teamDto.getTeamUuid());
+        assertNotNull(teamDto.getUserUuid());
+
+        Team t = teamDAO.findByUuid(UUID.fromString(teamDto.getTeamUuid()));
+
+        assertNotNull(t);
+
+        if(Objects.equals(t.getAdminUuid(),UUID.fromString(teamDto.getUserUuid()))){
+
+            teamDAO.delete(t);
+            return true;
+        }
         return false;
     }
 

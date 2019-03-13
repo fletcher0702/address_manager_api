@@ -2,24 +2,31 @@ package com.fantech.addressmanager.api.dao;
 
 import com.fantech.addressmanager.api.entity.Team;
 import com.fantech.addressmanager.api.entity.User;
+import com.fantech.addressmanager.api.entity.Zone;
 import com.fantech.addressmanager.api.util.HibernateUtilConfiguration;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManagerFactory;
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @Repository
 public class TeamDAO extends DAO<Team> {
+
+    private ZoneDAO zoneDAO;
     @Autowired
-    public TeamDAO(HibernateUtilConfiguration hibernateUtilConfiguration, EntityManagerFactory entityManagerFactory) {
+    public TeamDAO(HibernateUtilConfiguration hibernateUtilConfiguration, EntityManagerFactory entityManagerFactory,ZoneDAO zoneDAO) {
         super(hibernateUtilConfiguration, entityManagerFactory);
+        this.zoneDAO = zoneDAO;
     }
 
     @Override
@@ -27,9 +34,35 @@ public class TeamDAO extends DAO<Team> {
         return save(obj);
     }
 
+    @Transactional
     @Override
-    public boolean delete(Team obj) {
-        return false;
+    public boolean delete(Team t) {
+
+        entityManager.joinTransaction();
+        assertNotNull(t);
+        Team td = entityManager.find(Team.class,t.getUuid());
+
+        entityManager
+                .createNativeQuery("delete from user_team where team_uuid = :teamUuid")
+                .setParameter("teamUuid", t.getUuid())
+                .executeUpdate();
+
+
+        for(Zone zone : td.getZones()){
+            zoneDAO.delete(zone);
+        }
+
+        td.getUsers().clear();
+        entityManager.persist(td);
+        entityManager.flush();
+
+        entityManager
+                .createNativeQuery("delete from team where uuid = :teamUuid")
+                .setParameter("teamUuid", t.getUuid())
+                .executeUpdate();
+
+
+        return true;
     }
 
     @Override
