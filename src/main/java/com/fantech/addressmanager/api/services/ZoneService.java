@@ -1,9 +1,11 @@
 package com.fantech.addressmanager.api.services;
 
 import com.fantech.addressmanager.api.dao.TeamDAO;
+import com.fantech.addressmanager.api.dao.UserDAO;
 import com.fantech.addressmanager.api.dao.ZoneDAO;
 import com.fantech.addressmanager.api.dto.zone.CreateZoneDto;
 import com.fantech.addressmanager.api.entity.Team;
+import com.fantech.addressmanager.api.entity.User;
 import com.fantech.addressmanager.api.entity.Zone;
 import com.fantech.addressmanager.api.entity.common.Coordinates;
 import com.fantech.addressmanager.api.helpers.AddressHelper;
@@ -17,12 +19,14 @@ import java.util.UUID;
 @Service
 public class ZoneService {
 
+    private UserDAO userDAO;
     private ZoneDAO zoneDAO;
     private TeamDAO teamDAO;
     private AddressHelper addressHelper;
 
     @Autowired
-    public ZoneService(ZoneDAO zoneDAO, TeamDAO teamDAO, AddressHelper addressHelper) {
+    public ZoneService(UserDAO userDAO,ZoneDAO zoneDAO, TeamDAO teamDAO, AddressHelper addressHelper) {
+        this.userDAO = userDAO;
         this.zoneDAO = zoneDAO;
         this.teamDAO = teamDAO;
         this.addressHelper = addressHelper;
@@ -30,17 +34,17 @@ public class ZoneService {
 
     public Zone createZone(CreateZoneDto createZoneDto) throws IOException {
 
-        if (createZoneDto.getAddress() != null && createZoneDto.getName() != null && createZoneDto.getTeamUuid() != null) {
+        if (createZoneDto.getAddress() != null && createZoneDto.getName() != null && createZoneDto.getTeamUuid() != null && createZoneDto.getUserUuid()!=null) {
 
             System.out.println("All Credentials presents...");
             System.out.println(createZoneDto.getTeamUuid());
             Team team = teamDAO.findByUuid(UUID.fromString(createZoneDto.getTeamUuid()));
-
-            if (team != null) {
-
+            User user = userDAO.findByUuid(UUID.fromString(createZoneDto.getUserUuid()));
+            if (team != null && user !=null) {
                 System.out.println("Related Team found...");
                 Zone zone = new Zone();
                 Coordinates coordinates = addressHelper.getCoordinates(createZoneDto.getAddress());
+                zone.setAdminUuid(UUID.fromString(createZoneDto.getUserUuid()));
                 zone.setName(createZoneDto.getName());
                 zone.setLatitude(coordinates.getLat());
                 zone.setLongitude(coordinates.getLng());

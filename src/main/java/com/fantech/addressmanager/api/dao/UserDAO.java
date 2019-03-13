@@ -8,6 +8,7 @@ import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import javax.persistence.EntityManagerFactory;
 import java.util.List;
 import java.util.UUID;
 
@@ -15,8 +16,8 @@ import java.util.UUID;
 public class UserDAO extends DAO<User> {
 
     @Autowired
-    public UserDAO(HibernateUtilConfiguration hibernateUtilConfiguration) {
-        super(hibernateUtilConfiguration);
+    public UserDAO(HibernateUtilConfiguration hibernateUtilConfiguration, EntityManagerFactory entityManagerFactory) {
+        super(hibernateUtilConfiguration, entityManagerFactory);
     }
 
     @Override

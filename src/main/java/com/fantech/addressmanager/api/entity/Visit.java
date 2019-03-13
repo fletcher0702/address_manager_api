@@ -1,6 +1,8 @@
 package com.fantech.addressmanager.api.entity;
 
 import com.fantech.addressmanager.api.entity.common.Resource;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 
@@ -22,7 +24,8 @@ public class Visit extends Resource {
     @Column(name="longitude")
     private double longitude;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Zone zone;
 
     public String getName() {

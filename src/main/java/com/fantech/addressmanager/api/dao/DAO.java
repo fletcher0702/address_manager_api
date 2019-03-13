@@ -7,17 +7,24 @@ import org.hibernate.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.UUID;
 
+@SuppressWarnings("ALL")
 public abstract class DAO<T> {
 
+    protected EntityManager entityManager;
     SessionFactory sessionFactory;
+    protected Session currentSession;
 
     @Autowired
     @Lazy
-    public DAO(HibernateUtilConfiguration hibernateUtilConfiguration) {
+    public DAO(HibernateUtilConfiguration hibernateUtilConfiguration,EntityManagerFactory entityManagerFactory) {
         this.sessionFactory = hibernateUtilConfiguration.getSessionFactory();
+        this.entityManager = entityManagerFactory.createEntityManager();
     }
 
     /**
@@ -28,7 +35,7 @@ public abstract class DAO<T> {
     public abstract boolean create(T obj);
 
     public boolean save(T obj){
-        Session session = this.sessionFactory.openSession();
+        Session session = getSession();
         Transaction tx = session.beginTransaction();
         session.save(obj);
         tx.commit();
@@ -36,8 +43,9 @@ public abstract class DAO<T> {
         return true;
     }
 
+    @Transactional
     public boolean updateObj(T obj){
-        Session session = this.sessionFactory.openSession();
+        Session session = getSession();
         Transaction tx = session.beginTransaction();
         session.update(obj);
         tx.commit();
@@ -71,5 +79,27 @@ public abstract class DAO<T> {
      * @return boolean
      */
     public abstract T findByUuid(UUID uuid);
+
+    public Session getSession(){
+
+        Session session;
+        if (currentSession!=null){
+            if(currentSession.isOpen()) session = currentSession;
+            else {
+                session = this.sessionFactory.openSession();
+                currentSession = session;
+            }
+        }else{
+            session = this.sessionFactory.openSession();
+            currentSession = session;
+        }
+
+        return session;
+    }
+
+    public void flushAndClear(){
+        entityManager.flush();
+        entityManager.clear();
+    }
 
 }

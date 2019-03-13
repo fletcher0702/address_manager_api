@@ -1,9 +1,11 @@
 package com.fantech.addressmanager.api.entity;
 
 import com.fantech.addressmanager.api.entity.common.Resource;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.util.Set;
+import java.util.UUID;
 
 @Entity
 @Table(name = "zone")
@@ -11,6 +13,10 @@ public class Zone extends Resource {
 
     @Column(name = "name")
     private String name;
+
+    @JsonIgnore
+    @Column(name = "adminUuid",nullable = false, updatable = false)
+    private UUID adminUuid;
 
     @Column(name = "latitude")
     private double latitude;
@@ -21,7 +27,7 @@ public class Zone extends Resource {
     @ManyToOne
     private Team team;
 
-    @OneToMany(mappedBy = "zone")
+    @OneToMany(mappedBy = "zone",orphanRemoval = true,cascade =CascadeType.ALL,fetch = FetchType.EAGER)
     private Set<Visit> visits;
 
     public Zone() {
@@ -41,6 +47,14 @@ public class Zone extends Resource {
 
     public Set<Visit> getVisits() {
         return visits;
+    }
+
+    public UUID getAdminUuid() {
+        return adminUuid;
+    }
+
+    public void setAdminUuid(UUID adminUuid) {
+        this.adminUuid = adminUuid;
     }
 
     public void setName(String name) {

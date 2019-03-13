@@ -5,9 +5,11 @@ import com.fantech.addressmanager.api.entity.User;
 import com.fantech.addressmanager.api.util.HibernateUtilConfiguration;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManagerFactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -15,9 +17,9 @@ import java.util.UUID;
 
 @Repository
 public class TeamDAO extends DAO<Team> {
-
-    public TeamDAO(HibernateUtilConfiguration hibernateUtilConfiguration) {
-        super(hibernateUtilConfiguration);
+    @Autowired
+    public TeamDAO(HibernateUtilConfiguration hibernateUtilConfiguration, EntityManagerFactory entityManagerFactory) {
+        super(hibernateUtilConfiguration, entityManagerFactory);
     }
 
     @Override
@@ -43,7 +45,7 @@ public class TeamDAO extends DAO<Team> {
     @Override
     public Team findByUuid(UUID uuid) {
 
-        Session session = this.sessionFactory.openSession();
+        Session session = getSession();
         String hql = "from Team t where t.uuid = :uuid";
         Query q = session.createQuery(hql);
         q.setParameter("uuid", uuid);
