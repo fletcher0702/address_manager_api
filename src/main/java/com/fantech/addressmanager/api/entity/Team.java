@@ -17,7 +17,7 @@ public class Team extends Resource {
     @Column(name="adminUuid",nullable = false,updatable = false)
     private UUID adminUuid;
 
-    @OneToMany(mappedBy = "team")
+    @OneToMany(mappedBy = "team",fetch = FetchType.EAGER)
     private Set<Zone> zones;
 
     @ManyToMany(mappedBy = "teams",fetch = FetchType.EAGER)
