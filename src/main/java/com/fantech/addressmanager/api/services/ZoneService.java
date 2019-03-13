@@ -4,6 +4,7 @@ import com.fantech.addressmanager.api.dao.TeamDAO;
 import com.fantech.addressmanager.api.dao.UserDAO;
 import com.fantech.addressmanager.api.dao.ZoneDAO;
 import com.fantech.addressmanager.api.dto.zone.CreateZoneDto;
+import com.fantech.addressmanager.api.dto.zone.DeleteZoneDto;
 import com.fantech.addressmanager.api.entity.Team;
 import com.fantech.addressmanager.api.entity.User;
 import com.fantech.addressmanager.api.entity.Zone;
@@ -14,7 +15,10 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @Service
 public class ZoneService {
@@ -86,5 +90,32 @@ public class ZoneService {
         }
         System.out.println("User not found...");
         return null;
+    }
+
+    public Object deleteByUuid(DeleteZoneDto zoneDto){
+        assertNotNull(zoneDto.getUserUuid());
+        assertNotNull(zoneDto.getZoneUuid());
+        assertNotNull(zoneDto.getTeamUuid());
+
+        Team team  = teamDAO.findByUuid(UUID.fromString(zoneDto.getTeamUuid()));
+        assertNotNull(team);
+
+        Zone z = zoneDAO.findByUuid(UUID.fromString(zoneDto.getZoneUuid()));
+
+        assertNotNull(z);
+
+        for(Zone zone : team.getZones()){
+
+            if(Objects.equals(zone.getUuid(),z.getUuid())){
+
+                if(Objects.equals(z.getAdminUuid(),UUID.fromString(zoneDto.getUserUuid()))){
+
+                    return zoneDAO.delete(z);
+                }
+
+            }
+        }
+
+        return false;
     }
 }

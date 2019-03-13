@@ -9,8 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManagerFactory;
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @Repository
 public class ZoneDAO extends DAO<Zone> {
@@ -25,9 +28,17 @@ public class ZoneDAO extends DAO<Zone> {
         return save(zone);
     }
 
+    @Transactional
     @Override
-    public boolean delete(Zone obj) {
-        return false;
+    public boolean delete(Zone z) {
+
+        entityManager.joinTransaction();
+        assertNotNull(z);
+        entityManager
+                .createNativeQuery("delete from ZONE where uuid = :zoneUuid ")
+                .setParameter("zoneUuid", z.getUuid())
+                .executeUpdate();
+        return true;
     }
 
     @Override
