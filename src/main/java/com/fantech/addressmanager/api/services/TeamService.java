@@ -2,9 +2,11 @@ package com.fantech.addressmanager.api.services;
 
 import com.fantech.addressmanager.api.dao.TeamDAO;
 import com.fantech.addressmanager.api.dao.UserDAO;
+import com.fantech.addressmanager.api.dto.status.CreateStatusDto;
 import com.fantech.addressmanager.api.dto.team.DeleteTeamDto;
 import com.fantech.addressmanager.api.dto.team.InviteUsersDto;
 import com.fantech.addressmanager.api.dto.team.TeamDto;
+import com.fantech.addressmanager.api.entity.Status;
 import com.fantech.addressmanager.api.entity.Team;
 import com.fantech.addressmanager.api.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -111,6 +113,21 @@ public class TeamService {
 
             teamDAO.delete(t);
             return true;
+        }
+        return false;
+    }
+
+    public Object createStatus(CreateStatusDto statusDto){
+
+        assertNotNull(statusDto.getUserUuid());
+        assertNotNull(statusDto.getTeamUuid());
+        assertNotNull(statusDto.getStatus());
+
+        Team t = teamDAO.findByUuid(UUID.fromString(statusDto.getTeamUuid()));
+        assertNotNull(t);
+
+        if(Objects.equals(t.getAdminUuid(),UUID.fromString(statusDto.getUserUuid()))){
+            return teamDAO.addStatus(t.getUuid(),statusDto.getStatus());
         }
         return false;
     }

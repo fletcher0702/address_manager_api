@@ -1,5 +1,6 @@
 package com.fantech.addressmanager.api.controller;
 
+import com.fantech.addressmanager.api.dto.status.CreateStatusDto;
 import com.fantech.addressmanager.api.dto.team.DeleteTeamDto;
 import com.fantech.addressmanager.api.dto.team.InviteUsersDto;
 import com.fantech.addressmanager.api.dto.team.TeamDto;
@@ -26,6 +27,11 @@ public class UserTeamController {
     @PostMapping("/teams/create")
     public Object createOne(@RequestBody TeamDto teamDto){
         return teamService.createTeam(teamDto);
+    }
+
+    @PostMapping("/teams/status/create")
+    public Object createTeamStatus(@RequestBody CreateStatusDto statusDto){
+        return teamService.createStatus(statusDto);
     }
 
 
