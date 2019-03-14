@@ -17,8 +17,10 @@ public class Visit extends Resource {
     private String address;
     @Column(name="phone_number")
     private String phoneNumber;
-    @Column(name="status")
-    private String status;
+
+    @OneToOne(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
+    @MapsId
+    private Status status;
     @Column(name="latitude")
     private double latitude;
     @Column(name="longitude")
@@ -40,7 +42,7 @@ public class Visit extends Resource {
         return phoneNumber;
     }
 
-    public String getStatus() {
+    public Status getStatus() {
         return status;
     }
 
@@ -64,7 +66,7 @@ public class Visit extends Resource {
         this.phoneNumber = phoneNumber;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(Status status) {
         this.status = status;
     }
 

@@ -5,6 +5,7 @@ import com.fantech.addressmanager.api.dao.VisitDAO;
 import com.fantech.addressmanager.api.dao.ZoneDAO;
 import com.fantech.addressmanager.api.dto.visit.DeleteVisitDto;
 import com.fantech.addressmanager.api.dto.visit.VisitDto;
+import com.fantech.addressmanager.api.entity.Status;
 import com.fantech.addressmanager.api.entity.Team;
 import com.fantech.addressmanager.api.entity.Visit;
 import com.fantech.addressmanager.api.entity.Zone;
@@ -18,6 +19,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SuppressWarnings("Duplicates")
 @Service
@@ -39,21 +42,27 @@ public class VisitService {
     public Visit createVisit(VisitDto visitDto) throws IOException {
 
 
-        if (visitDto.getName() != null && visitDto.getAddress() != null && visitDto.getStatus() != null && visitDto.getZoneUuid() != null && visitDto.getZoneUuid() != null) {
+        if (visitDto.getStatusUuid() != null && visitDto.getAddress() != null && visitDto.getZoneUuid() != null && visitDto.getZoneUuid() != null) {
 
+            System.out.println("Credentials controls passed...");
             Team team = teamDAO.findByUuid(UUID.fromString(visitDto.getTeamUuid()));
 
             if (team != null) {
 
+                System.out.println("Team Found...");
                 Zone zone = zoneDAO.findByUuid(UUID.fromString(visitDto.getZoneUuid()));
 
                 if (zone != null) {
 
+                    System.out.println("Zone Found...");
+                    Status status = teamDAO.findStatusByUuid(UUID.fromString(visitDto.getStatusUuid()));
+                    assertNotNull(status);
+                    System.out.println("Status found...");
                     Visit visit = new Visit();
                     Coordinates coordinates = addressHelper.getCoordinates(visitDto.getAddress());
-                    visit.setName(visitDto.getName());
+                    visit.setName(visitDto.getStatusUuid());
                     visit.setAddress(visitDto.getAddress());
-                    visit.setStatus(visitDto.getStatus());
+                    visit.setStatus(status);
                     visit.setPhoneNumber(visitDto.getPhoneNumber());
                     zone.setTeam(team);
                     visit.setZone(zone);

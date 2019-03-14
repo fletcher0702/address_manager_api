@@ -34,6 +34,7 @@ public abstract class DAO<T> {
      */
     public abstract boolean create(T obj);
 
+    @Transactional(value = Transactional.TxType.REQUIRES_NEW)
     public boolean save(T obj){
         Session session = getSession();
         Transaction tx = session.beginTransaction();
