@@ -3,18 +3,17 @@ package com.fantech.addressmanager.api.dto.visit;
 public class VisitDto {
 
     private String teamUuid;
-    private String name;
+    private String statusUuid;
     private String address;
     private String zoneUuid;
-    private String status;
     private String phoneNumber;
 
     public String getTeamUuid() {
         return teamUuid;
     }
 
-    public String getName() {
-        return name;
+    public String getStatusUuid() {
+        return statusUuid;
     }
 
     public String getAddress() {
@@ -23,10 +22,6 @@ public class VisitDto {
 
     public String getZoneUuid() {
         return zoneUuid;
-    }
-
-    public String getStatus() {
-        return status;
     }
 
     public String getPhoneNumber() {

@@ -104,17 +104,20 @@ public class TeamDAO extends DAO<Team> {
         return null;
     }
 
+    @Transactional
     @Override
     public Team findByUuid(UUID uuid) {
 
-        Session session = getSession();
-        String hql = "from Team t where t.uuid = :uuid";
-        Query q = session.createQuery(hql);
-        q.setParameter("uuid", uuid);
-
-        Team t = (Team) q.uniqueResult();
+//        Session session = getSession();
+//        String hql = "from Team t where t.uuid = :uuid";
+//        Query q = session.createQuery(hql);
+//        q.setParameter("uuid", uuid);
+//
+//        Team t = (Team) q.uniqueResult();
+//        entityManager.joinTransaction();
+        return entityManager.find(Team.class, uuid);
 //        session.close();
-        return t;
+//        return t;
     }
 
     public Team findUserTeamByUuid(UUID userUuid, UUID teamUuid) {
@@ -145,5 +148,11 @@ public class TeamDAO extends DAO<Team> {
         }
 
         return toReturn;
+    }
+
+    @Transactional
+    public Status findStatusByUuid(UUID statusUuid){
+        return entityManager.find(Status.class,statusUuid);
+
     }
 }
