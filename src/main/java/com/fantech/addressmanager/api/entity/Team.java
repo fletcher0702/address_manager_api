@@ -25,6 +25,10 @@ public class Team extends Resource {
     @ManyToMany(mappedBy = "teams",fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST,CascadeType.MERGE})
     private Set<User> users;
 
+    @OneToMany(mappedBy = "team",fetch = FetchType.EAGER,cascade = CascadeType.ALL)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private Set<Status> status;
+
     public String getName() {
         return name;
     }
@@ -39,6 +43,10 @@ public class Team extends Resource {
 
     public Set<Zone> getZones() {
         return zones;
+    }
+
+    public Set<Status> getStatus() {
+        return status;
     }
 
     public void setName(String name) {
