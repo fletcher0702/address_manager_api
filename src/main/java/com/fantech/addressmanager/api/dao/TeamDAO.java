@@ -1,10 +1,13 @@
 package com.fantech.addressmanager.api.dao;
 
+import com.fantech.addressmanager.api.dto.status.StatusDto;
+import com.fantech.addressmanager.api.entity.Status;
 import com.fantech.addressmanager.api.entity.Team;
 import com.fantech.addressmanager.api.entity.User;
 import com.fantech.addressmanager.api.entity.Zone;
 import com.fantech.addressmanager.api.util.HibernateUtilConfiguration;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -15,7 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -70,6 +72,33 @@ public class TeamDAO extends DAO<Team> {
         return false;
     }
 
+    @Transactional
+    public boolean addStatus(UUID teamUuid, List<StatusDto> status){
+        entityManager.joinTransaction();
+        Team t = findByUuid(teamUuid);
+
+        assertNotNull(t);
+
+        for(StatusDto st: status){
+            Status tmp = new Status();
+
+            assertNotNull(st.getName());
+            assertNotNull(st.getColor());
+
+            tmp.setTeam(t);
+            tmp.setName(st.getName());
+            tmp.setColor(st.getColor());
+            t.getStatus().add(tmp);
+        }
+
+        Session session = getSession();
+        Transaction tx = session.beginTransaction();
+        session.update(t);
+        tx.commit();
+        return true;
+
+    }
+
     @Override
     public List findAll() {
         return null;
@@ -84,7 +113,7 @@ public class TeamDAO extends DAO<Team> {
         q.setParameter("uuid", uuid);
 
         Team t = (Team) q.uniqueResult();
-        session.close();
+//        session.close();
         return t;
     }
 
