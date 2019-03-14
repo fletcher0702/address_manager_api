@@ -55,6 +55,7 @@ public class TeamDAO extends DAO<Team> {
         }
 
         td.getUsers().clear();
+        td.getStatus().clear();
         entityManager.persist(td);
         entityManager.flush();
 
