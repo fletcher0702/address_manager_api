@@ -82,15 +82,6 @@ public class ZoneDAO extends DAO<Zone> {
     @Transactional
     @Override
     public Zone findByUuid(UUID uuid) {
-
-//        Session session = getSession();
-//
-//        String hql = "from Zone z where z.uuid = :uuid";
-//        Query q = session.createQuery(hql);
-//        q.setParameter("uuid", uuid);
-//        Zone z = (Zone)q.uniqueResult();
         return entityManager.find(Zone.class,uuid);
-//        session.close();
-//        return z;
     }
 }

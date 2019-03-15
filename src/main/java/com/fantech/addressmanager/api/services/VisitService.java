@@ -60,7 +60,7 @@ public class VisitService {
                     System.out.println("Status found...");
                     Visit visit = new Visit();
                     Coordinates coordinates = addressHelper.getCoordinates(visitDto.getAddress());
-                    visit.setName(visitDto.getStatusUuid());
+                    visit.setName(visitDto.getName());
                     visit.setAddress(visitDto.getAddress());
                     visit.setStatus(status);
                     visit.setPhoneNumber(visitDto.getPhoneNumber());
@@ -110,6 +110,7 @@ public class VisitService {
                     for(Visit v : zone.getVisits()){
 
                         if(Objects.equals(v.getUuid(),UUID.fromString(visitDto.getVisitUuid()))){
+                            System.out.println("Find candidate for deletion...");
                             res.put("deleted",visitDAO.deleteByUuid(UUID.fromString(visitDto.getVisitUuid())));
                             break;
                         }

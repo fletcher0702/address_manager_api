@@ -19,7 +19,7 @@ public class Visit extends Resource {
     private String phoneNumber;
 
     @OneToOne(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
-    @MapsId
+    @JoinColumn
     private Status status;
     @Column(name="latitude")
     private double latitude;

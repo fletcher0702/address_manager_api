@@ -4,9 +4,14 @@ public class VisitDto {
 
     private String teamUuid;
     private String statusUuid;
+    private String name;
     private String address;
     private String zoneUuid;
     private String phoneNumber;
+
+    public String getName() {
+        return name;
+    }
 
     public String getTeamUuid() {
         return teamUuid;
