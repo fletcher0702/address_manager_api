@@ -11,3 +11,15 @@ services:
       - ./pgdata:/var/lib/postgresql/data
     ports:
       - "5433:5432"
+    tty: true
+
+  app:
+    container_name: address_manager_api
+    build:
+      context: .
+      dockerfile: ./docker/app/Dockerfile
+    ports:
+      - "3000:3000"
+    links:
+      - "db:database"
+    tty: true
