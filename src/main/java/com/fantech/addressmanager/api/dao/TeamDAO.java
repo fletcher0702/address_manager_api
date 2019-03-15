@@ -92,10 +92,8 @@ public class TeamDAO extends DAO<Team> {
             t.getStatus().add(tmp);
         }
 
-        Session session = getSession();
-        Transaction tx = session.beginTransaction();
-        session.update(t);
-        tx.commit();
+        entityManager.persist(t);
+        flushAndClear();
         return true;
 
     }

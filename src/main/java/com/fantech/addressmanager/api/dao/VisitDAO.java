@@ -40,10 +40,10 @@ public class VisitDAO extends DAO<Visit>{
         Visit v = findByUuid(visitUuid);
         assertNotNull(v);
         entityManager.joinTransaction();
-        entityManager
+        System.out.println(entityManager
                 .createNativeQuery("delete from Visit where uuid = :visitUuid ")
                 .setParameter("visitUuid", v.getUuid())
-                .executeUpdate();
+                .executeUpdate());
         return true;
     }
 
@@ -77,6 +77,7 @@ public class VisitDAO extends DAO<Visit>{
         return q.list();
     }
 
+    @Transactional
     @Override
     public Visit findByUuid(UUID uuid) {
         return  entityManager.find(Visit.class,uuid);
