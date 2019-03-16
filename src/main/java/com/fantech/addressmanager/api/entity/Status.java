@@ -13,7 +13,7 @@ public class Status extends Resource {
     private String name;
 
     @Column(name="color")
-    private Integer color;
+    private Long color;
 
     @ManyToOne
     private Team team;
@@ -22,7 +22,7 @@ public class Status extends Resource {
         return name;
     }
 
-    public Integer getColor() {
+    public Long getColor() {
         return color;
     }
 
@@ -34,7 +34,7 @@ public class Status extends Resource {
         this.name = name;
     }
 
-    public void setColor(Integer color) {
+    public void setColor(Long color) {
         this.color = color;
     }
 }

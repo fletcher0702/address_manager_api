@@ -3,13 +3,13 @@ package com.fantech.addressmanager.api.dto.status;
 public class StatusDto {
 
     private String name;
-    private Integer color;
+    private Long color;
 
     public String getName() {
         return name;
     }
 
-    public Integer getColor() {
+    public Long getColor() {
         return color;
     }
 }
