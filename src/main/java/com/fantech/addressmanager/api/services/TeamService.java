@@ -3,6 +3,7 @@ package com.fantech.addressmanager.api.services;
 import com.fantech.addressmanager.api.dao.TeamDAO;
 import com.fantech.addressmanager.api.dao.UserDAO;
 import com.fantech.addressmanager.api.dto.status.CreateStatusDto;
+import com.fantech.addressmanager.api.dto.status.DeleteStatusDto;
 import com.fantech.addressmanager.api.dto.team.DeleteTeamDto;
 import com.fantech.addressmanager.api.dto.team.InviteUsersDto;
 import com.fantech.addressmanager.api.dto.team.TeamDto;
@@ -132,4 +133,23 @@ public class TeamService {
         return false;
     }
 
+
+    public Object deleteStatus(DeleteStatusDto statusDto) {
+
+        assertNotNull(statusDto.getUserUuid());
+        assertNotNull(statusDto.getTeamUuid());
+        assertNotNull(statusDto.getStatusUuid());
+
+        UUID teamUuid = UUID.fromString(statusDto.getTeamUuid());
+        Team team = teamDAO.findByUuid(teamUuid);
+
+        assertNotNull(team);
+
+        if(Objects.equals(team.getAdminUuid(),UUID.fromString(statusDto.getUserUuid()))){
+
+            return teamDAO.deleteStatus(teamUuid,UUID.fromString(statusDto.getStatusUuid()));
+        }
+
+        return false;
+    }
 }
