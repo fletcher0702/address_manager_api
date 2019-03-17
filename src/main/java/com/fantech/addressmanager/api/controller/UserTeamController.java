@@ -1,6 +1,7 @@
 package com.fantech.addressmanager.api.controller;
 
 import com.fantech.addressmanager.api.dto.status.CreateStatusDto;
+import com.fantech.addressmanager.api.dto.status.DeleteStatusDto;
 import com.fantech.addressmanager.api.dto.team.DeleteTeamDto;
 import com.fantech.addressmanager.api.dto.team.InviteUsersDto;
 import com.fantech.addressmanager.api.dto.team.TeamDto;
@@ -60,4 +61,8 @@ public class UserTeamController {
         return zoneService.deleteByUuid(zoneDto);
     }
 
+    @DeleteMapping("/teams/status")
+    public Object deleteStatusByUuid(@RequestBody DeleteStatusDto statusDto){
+        return teamService.deleteStatus(statusDto);
+    }
 }
