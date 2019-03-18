@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManagerFactory;
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.UUID;
 
@@ -54,16 +55,10 @@ public class UserDAO extends DAO<User> {
         return q.list();
     }
 
+    @Transactional
     @Override
     public User findByUuid(UUID uuid) {
-        Session session = this.sessionFactory.openSession();
-        String hql = "from User u where u.uuid = :uuid";
-        Query q = session.createQuery(hql);
-        q.setParameter("uuid", uuid);
-
-        User u = getUser(q);
-        session.close();
-        return u;
+       return entityManager.find(User.class,uuid);
     }
 
 

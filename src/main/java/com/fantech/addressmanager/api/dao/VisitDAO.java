@@ -1,6 +1,10 @@
 package com.fantech.addressmanager.api.dao;
 
+import com.fantech.addressmanager.api.dto.visit.UpdateVisitDto;
+import com.fantech.addressmanager.api.entity.Status;
 import com.fantech.addressmanager.api.entity.Visit;
+import com.fantech.addressmanager.api.entity.Zone;
+import com.fantech.addressmanager.api.entity.common.Coordinates;
 import com.fantech.addressmanager.api.util.HibernateUtilConfiguration;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
@@ -10,6 +14,7 @@ import org.springframework.stereotype.Repository;
 import javax.persistence.EntityManagerFactory;
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -81,5 +86,70 @@ public class VisitDAO extends DAO<Visit>{
     @Override
     public Visit findByUuid(UUID uuid) {
         return  entityManager.find(Visit.class,uuid);
+    }
+
+    @Transactional
+    public boolean updateVisitByUuidAdmin(UUID visitUuid, UpdateVisitDto visitDto, Coordinates coordinates){
+
+        entityManager.joinTransaction();
+        Visit v = entityManager.find(Visit.class,visitUuid);
+        assertNotNull(v);
+
+        System.out.println("Visit found...");
+
+        if(visitDto.getName()!=null){
+
+            if(!visitDto.getName().isEmpty()){
+                v.setName(visitDto.getName());
+            }
+        }
+        if(visitDto.getPhoneNumber()!=null){
+
+            if(!visitDto.getPhoneNumber().isEmpty()){
+                v.setPhoneNumber(visitDto.getPhoneNumber());
+            }
+
+        }
+        if(visitDto.getStatusUuid()!=null){
+            if(!visitDto.getStatusUuid().isEmpty()){
+                Status s = entityManager.find(Status.class,UUID.fromString(visitDto.getStatusUuid()));
+                assertNotNull(s);
+                System.out.println("Status found...");
+                v.setStatus(s);
+            }
+        }
+
+        Zone zone = entityManager.find(Zone.class,UUID.fromString(visitDto.getZoneUuid()));
+
+        assertNotNull(zone);
+
+        System.out.println("Good zone for update change...");
+        if(Objects.equals(zone.getAdminUuid(),UUID.fromString(visitDto.getUserUuid()))) v.setZone(zone);
+
+        if(coordinates!=null){
+            v.setAddress(visitDto.getAddress());
+            v.setLatitude(coordinates.getLat());
+            v.setLongitude(coordinates.getLng());
+        }
+
+        entityManager.persist(v);
+        flushAndClear();
+
+        return true;
+    }
+
+    @Transactional
+    public boolean updateVisitStatus(UUID visitUuid,UUID statusUuid){
+        entityManager.joinTransaction();
+        Visit v = entityManager.find(Visit.class,visitUuid);
+        assertNotNull(v);
+        Status s = entityManager.find(Status.class,statusUuid);
+        assertNotNull(s);
+        v.setStatus(s);
+
+        entityManager.persist(v);
+        flushAndClear();
+
+        return true;
     }
 }

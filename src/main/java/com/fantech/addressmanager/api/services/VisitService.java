@@ -1,14 +1,13 @@
 package com.fantech.addressmanager.api.services;
 
 import com.fantech.addressmanager.api.dao.TeamDAO;
+import com.fantech.addressmanager.api.dao.UserDAO;
 import com.fantech.addressmanager.api.dao.VisitDAO;
 import com.fantech.addressmanager.api.dao.ZoneDAO;
 import com.fantech.addressmanager.api.dto.visit.DeleteVisitDto;
+import com.fantech.addressmanager.api.dto.visit.UpdateVisitDto;
 import com.fantech.addressmanager.api.dto.visit.VisitDto;
-import com.fantech.addressmanager.api.entity.Status;
-import com.fantech.addressmanager.api.entity.Team;
-import com.fantech.addressmanager.api.entity.Visit;
-import com.fantech.addressmanager.api.entity.Zone;
+import com.fantech.addressmanager.api.entity.*;
 import com.fantech.addressmanager.api.entity.common.Coordinates;
 import com.fantech.addressmanager.api.helpers.AddressHelper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,13 +25,15 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @Service
 public class VisitService {
 
+    private UserDAO userDAO;
     private TeamDAO teamDAO;
     private VisitDAO visitDAO;
     private ZoneDAO zoneDAO;
     private AddressHelper addressHelper;
 
     @Autowired
-    public VisitService(TeamDAO teamDAO, VisitDAO visitDAO, ZoneDAO zoneDAO, AddressHelper addressHelper) {
+    public VisitService(UserDAO userDAO,TeamDAO teamDAO, VisitDAO visitDAO, ZoneDAO zoneDAO, AddressHelper addressHelper) {
+        this.userDAO = userDAO;
         this.teamDAO = teamDAO;
         this.visitDAO = visitDAO;
         this.zoneDAO = zoneDAO;
@@ -124,6 +125,56 @@ public class VisitService {
         }
         res.put("deleted",false);
         return res;
+    }
+
+    public Object updateVisitByUuid(UpdateVisitDto visitDto){
+
+        HashMap<String,Object> res = new HashMap<>();
+        try{
+
+            assertNotNull(visitDto);
+            assertNotNull(visitDto.getUserUuid());
+            assertNotNull(visitDto.getTeamUuid());
+            assertNotNull(visitDto.getVisitUuid());
+            assertNotNull(visitDto.getZoneUuid());
+
+            Zone zone = zoneDAO.findZoneByTeamUuid(UUID.fromString(visitDto.getTeamUuid()),UUID.fromString(visitDto.getZoneUuid()));
+
+            assertNotNull(zone);
+
+            if(Objects.equals(zone.getAdminUuid(),UUID.fromString(visitDto.getUserUuid()))){
+
+                System.out.println("In the if condition of administrator !");
+                Coordinates coordinates = null;
+
+                if(visitDto.getAddress()!=null){
+                    if(!visitDto.getAddress().isEmpty()) coordinates = addressHelper.getCoordinates(visitDto.getAddress());
+                }
+                System.out.println("Good owner requester !");
+                res.put("updated",visitDAO.updateVisitByUuidAdmin(UUID.fromString(visitDto.getVisitUuid()),visitDto,coordinates));
+
+            }else {
+                System.out.println("Not an admin...");
+                User user = userDAO.findByUuid(UUID.fromString(visitDto.getUserUuid()));
+                assertNotNull(user);
+                Team team = teamDAO.findByUuid(UUID.fromString(visitDto.getTeamUuid()));
+                assertNotNull(team);
+                assertNotNull(visitDto.getStatusUuid());
+
+                if(teamDAO.userBelongsToTeam(team.getUuid(),user.getUuid())) {
+                    res.put("updated",visitDAO.updateVisitStatus(UUID.fromString(visitDto.getVisitUuid()),UUID.fromString(visitDto.getStatusUuid())));
+                }else res.put("update","User not found");
+            }
+
+            return res;
+
+        }catch(Exception e){
+
+            res.put("message", "Bad credentials send or invalid user");
+
+        }
+
+        return false;
     }
     
 }

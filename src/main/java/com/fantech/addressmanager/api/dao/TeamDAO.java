@@ -206,4 +206,19 @@ public class TeamDAO extends DAO<Team> {
         return (Status) q.uniqueResult();
 
     }
+
+    @Transactional
+    public boolean userBelongsToTeam(UUID teamUuid, UUID userUuid){
+
+        Team team = entityManager.find(Team.class,teamUuid);
+
+        assertNotNull(team);
+
+        for (User user : team.getUsers()){
+
+            if(Objects.equals(user.getUuid(),userUuid)) return true;
+        }
+
+        return false;
+    }
 }
