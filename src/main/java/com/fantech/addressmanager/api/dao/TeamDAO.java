@@ -127,6 +127,23 @@ public class TeamDAO extends DAO<Team> {
         return entityManager.find(Team.class, uuid);
     }
 
+    @Transactional
+    public void addUserInTeam(UUID teamUuid, ArrayList<UUID> users){
+
+        entityManager.joinTransaction();
+        Team team = entityManager.find(Team.class,teamUuid);
+        assertNotNull(team);
+
+        for(UUID userUuid : users){
+            User user = entityManager.find(User.class,userUuid);
+            user.getTeams().add(team);
+            entityManager.persist(team);
+        }
+
+        flushAndClear();
+
+    }
+
     public Team findUserTeamByUuid(UUID userUuid, UUID teamUuid) {
         Session session = this.sessionFactory.openSession();
         String hql = "from Team t where t.adminUuid =:userUuid and t.uuid =:teamUuid";

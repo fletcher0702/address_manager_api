@@ -73,17 +73,18 @@ public class TeamService {
             if (Objects.equals(team.getAdminUuid(), UUID.fromString(inviteUsersDto.getUserUuid()))) {
                 List<String> created = new ArrayList<>();
                 HashMap<String, Object> res = new HashMap<>();
+                ArrayList<UUID> usersUuid = new ArrayList<>();
                 for (String email : inviteUsersDto.getEmails()) {
                     User user = userDAO.findByEmail(email);
 
                     if (user != null) {
 
-                        user.getTeams().add(team);
-                        userDAO.updateObj(user);
+                        usersUuid.add(user.getUuid());
                         created.add(email);
                     }
 
                 }
+                teamDAO.addUserInTeam(team.getUuid(),usersUuid);
 
                 res.put("email", created);
 
