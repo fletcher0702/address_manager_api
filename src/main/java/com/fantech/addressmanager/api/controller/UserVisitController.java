@@ -1,15 +1,16 @@
 package com.fantech.addressmanager.api.controller;
 
 import com.fantech.addressmanager.api.dto.visit.DeleteVisitDto;
+import com.fantech.addressmanager.api.dto.visit.UpdateVisitDto;
 import com.fantech.addressmanager.api.dto.visit.VisitDto;
 import com.fantech.addressmanager.api.entity.Visit;
 import com.fantech.addressmanager.api.services.VisitService;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/users")
@@ -32,9 +33,10 @@ public class UserVisitController {
         return visitService.createVisit(visitDto);
     }
 
-    @PatchMapping
-    public Visit updateVisit(Visit visit) {
-        return null;
+    @PatchMapping("/teams/zones/visits/update")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public Object updateVisit(@RequestBody UpdateVisitDto visitDto) {
+        return visitService.updateVisitByUuid(visitDto);
     }
 
     @DeleteMapping("/teams/zones/visits/delete")
