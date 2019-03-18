@@ -8,6 +8,7 @@ import com.fantech.addressmanager.api.dto.team.InviteUsersDto;
 import com.fantech.addressmanager.api.dto.team.TeamDto;
 import com.fantech.addressmanager.api.dto.team.UpdateTeamDto;
 import com.fantech.addressmanager.api.dto.zone.DeleteZoneDto;
+import com.fantech.addressmanager.api.dto.zone.UpdateZoneDto;
 import com.fantech.addressmanager.api.services.TeamService;
 import com.fantech.addressmanager.api.services.ZoneService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,6 +62,11 @@ public class UserTeamController {
     @PatchMapping("/teams/status/update")
     public Object updateStatus(@RequestBody UpdateStatusDto statusDto){
         return teamService.updateStatus(statusDto);
+    }
+
+    @PatchMapping("/teams/zones/update")
+    public Object updateZone(@RequestBody UpdateZoneDto zoneDto){
+        return zoneService.updateZone(zoneDto);
     }
 
     @DeleteMapping("/teams/delete")

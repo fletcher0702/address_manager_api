@@ -5,6 +5,7 @@ import com.fantech.addressmanager.api.dao.UserDAO;
 import com.fantech.addressmanager.api.dao.ZoneDAO;
 import com.fantech.addressmanager.api.dto.zone.CreateZoneDto;
 import com.fantech.addressmanager.api.dto.zone.DeleteZoneDto;
+import com.fantech.addressmanager.api.dto.zone.UpdateZoneDto;
 import com.fantech.addressmanager.api.entity.Team;
 import com.fantech.addressmanager.api.entity.User;
 import com.fantech.addressmanager.api.entity.Zone;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -65,6 +67,40 @@ public class ZoneService {
     public List findAll(String userUuid){
 
         return  zoneDAO.findAll();
+    }
+
+    public Object updateZone(UpdateZoneDto zoneDto){
+
+        HashMap<String,Object> res = new HashMap<>();
+        try{
+            assertNotNull(zoneDto);
+            assertNotNull(zoneDto.getUserUuid());
+            assertNotNull(zoneDto.getTeamUuid());
+            assertNotNull(zoneDto.getName());
+
+            Zone zone = zoneDAO.findZoneByTeamUuid(UUID.fromString(zoneDto.getTeamUuid()),UUID.fromString(zoneDto.getZoneUuid()));
+            assertNotNull(zone);
+
+            if(Objects.equals(zone.getAdminUuid(),UUID.fromString(zoneDto.getUserUuid()))){
+                Coordinates coordinates = null;
+                if(zoneDto.getAddress()!=null){
+                    coordinates = addressHelper.getCoordinates(zoneDto.getAddress());
+                }
+
+                res.put("updated", zoneDAO.updateZone(zone.getUuid(),zoneDto,coordinates));
+                return res;
+            }
+
+            res.put("updated","Bad Owner Unauthorized");
+
+            return res;
+
+
+        }catch(Exception e){
+            res.put("message","invalid credentials or non existing zone");
+
+            return res;
+        }
     }
 
     public List findAllByUserUuid(String teamUuid){
