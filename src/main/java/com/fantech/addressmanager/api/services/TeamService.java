@@ -8,6 +8,7 @@ import com.fantech.addressmanager.api.dto.status.UpdateStatusDto;
 import com.fantech.addressmanager.api.dto.team.DeleteTeamDto;
 import com.fantech.addressmanager.api.dto.team.InviteUsersDto;
 import com.fantech.addressmanager.api.dto.team.TeamDto;
+import com.fantech.addressmanager.api.dto.team.UpdateTeamDto;
 import com.fantech.addressmanager.api.entity.Status;
 import com.fantech.addressmanager.api.entity.Team;
 import com.fantech.addressmanager.api.entity.User;
@@ -179,6 +180,24 @@ public class TeamService {
             return teamDAO.updateStatus(status.getUuid(),statusDto.getStatus());
         }
 
+        return false;
+    }
+
+    public Object updateTeam(UpdateTeamDto teamDto){
+
+        assertNotNull(teamDto);
+        assertNotNull(teamDto.getName());
+        assertNotNull(teamDto.getTeamUuid());
+        assertNotNull(teamDto.getUserUuid());
+
+        Team team = teamDAO.findByUuid(UUID.fromString(teamDto.getTeamUuid()));
+
+        assertNotNull(team);
+
+        UUID userUuid = UUID.fromString(teamDto.getUserUuid());
+        if(Objects.equals(team.getAdminUuid(),userUuid)){
+            return teamDAO.updateTeam(team.getUuid(),teamDto);
+        }
         return false;
     }
 }
