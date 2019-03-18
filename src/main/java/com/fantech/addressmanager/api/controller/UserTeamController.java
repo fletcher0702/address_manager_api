@@ -2,6 +2,7 @@ package com.fantech.addressmanager.api.controller;
 
 import com.fantech.addressmanager.api.dto.status.CreateStatusDto;
 import com.fantech.addressmanager.api.dto.status.DeleteStatusDto;
+import com.fantech.addressmanager.api.dto.status.UpdateStatusDto;
 import com.fantech.addressmanager.api.dto.team.DeleteTeamDto;
 import com.fantech.addressmanager.api.dto.team.InviteUsersDto;
 import com.fantech.addressmanager.api.dto.team.TeamDto;
@@ -49,6 +50,11 @@ public class UserTeamController {
     @PostMapping("/teams/invite")
     public Object addUsersInTeam(@RequestBody InviteUsersDto inviteUsersDto){
         return teamService.addUsersInTeam(inviteUsersDto);
+    }
+
+    @PatchMapping("/teams/status/update")
+    public Object updateStatus(@RequestBody UpdateStatusDto statusDto){
+        return teamService.updateStatus(statusDto);
     }
 
     @DeleteMapping("/teams/delete")

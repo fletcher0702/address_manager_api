@@ -157,4 +157,35 @@ public class TeamDAO extends DAO<Team> {
 
         return true;
     }
+
+    @Transactional
+    public boolean updateStatus(UUID statusUuid, StatusDto statusDto){
+
+        entityManager.joinTransaction();
+        Status status = entityManager.find(Status.class,statusUuid);
+
+        assertNotNull(status);
+
+        status.setName(statusDto.getName());
+        status.setColor(statusDto.getColor());
+
+        entityManager.persist(status);
+        flushAndClear();
+
+        return true;
+    }
+
+    @Transactional
+    public Status findStatusByUuid(UUID teamUuid, UUID statusUuid){
+
+        Session session = getSession();
+        session.beginTransaction();
+        String hql = "from Status s where s.uuid= :statusUuid and s.team.uuid= :teamUuid";
+        Query q = session.createQuery(hql);
+        q.setParameter("statusUuid",statusUuid);
+        q.setParameter("teamUuid",teamUuid);
+
+        return (Status) q.uniqueResult();
+
+    }
 }
