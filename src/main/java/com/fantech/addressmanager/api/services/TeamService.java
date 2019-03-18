@@ -4,6 +4,7 @@ import com.fantech.addressmanager.api.dao.TeamDAO;
 import com.fantech.addressmanager.api.dao.UserDAO;
 import com.fantech.addressmanager.api.dto.status.CreateStatusDto;
 import com.fantech.addressmanager.api.dto.status.DeleteStatusDto;
+import com.fantech.addressmanager.api.dto.status.UpdateStatusDto;
 import com.fantech.addressmanager.api.dto.team.DeleteTeamDto;
 import com.fantech.addressmanager.api.dto.team.InviteUsersDto;
 import com.fantech.addressmanager.api.dto.team.TeamDto;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -148,6 +150,33 @@ public class TeamService {
         if(Objects.equals(team.getAdminUuid(),UUID.fromString(statusDto.getUserUuid()))){
 
             return teamDAO.deleteStatus(teamUuid,UUID.fromString(statusDto.getStatusUuid()));
+        }
+
+        return false;
+    }
+
+    @Transactional
+    public Object updateStatus(UpdateStatusDto statusDto){
+
+        assertNotNull(statusDto);
+        assertNotNull(statusDto.getUserUuid());
+        assertNotNull(statusDto.getTeamUuid());
+        assertNotNull(statusDto.getStatusUuid());
+        assertNotNull(statusDto.getStatus());
+
+        UUID teamUuid = UUID.fromString(statusDto.getTeamUuid());
+
+        Team team = teamDAO.findByUuid(teamUuid);
+
+        assertNotNull(team);
+
+        if(Objects.equals(team.getAdminUuid(),UUID.fromString(statusDto.getUserUuid()))){
+
+            Status status = teamDAO.findStatusByUuid(teamUuid,UUID.fromString(statusDto.getStatusUuid()));
+
+            assertNotNull(status);
+
+            return teamDAO.updateStatus(status.getUuid(),statusDto.getStatus());
         }
 
         return false;

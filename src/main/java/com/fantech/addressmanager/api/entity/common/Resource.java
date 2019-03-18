@@ -1,8 +1,6 @@
 package com.fantech.addressmanager.api.entity.common;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -12,7 +10,6 @@ import java.util.Date;
 import java.util.UUID;
 
 @MappedSuperclass
-//@JsonIdentityInfo(property = "uuid", generator = ObjectIdGenerators.UUIDGenerator.class)
 public class Resource {
 
     @Id
