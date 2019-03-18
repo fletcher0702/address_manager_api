@@ -144,4 +144,17 @@ public class TeamDAO extends DAO<Team> {
         return entityManager.find(Status.class,statusUuid);
 
     }
+
+    @Transactional
+    public boolean deleteStatus(UUID teamUuid,UUID statusUuid){
+        entityManager.joinTransaction();
+        assertNotNull(teamUuid);
+        assertNotNull(statusUuid);
+        entityManager.createNativeQuery("DELETE FROM status where team_uuid = :teamUuid AND uuid = :statusUuid")
+                .setParameter("teamUuid",teamUuid)
+                .setParameter("statusUuid",statusUuid)
+                .executeUpdate();
+
+        return true;
+    }
 }
