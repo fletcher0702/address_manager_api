@@ -1,6 +1,7 @@
 package com.fantech.addressmanager.api.dao;
 
 import com.fantech.addressmanager.api.dto.status.StatusDto;
+import com.fantech.addressmanager.api.dto.team.UpdateTeamDto;
 import com.fantech.addressmanager.api.entity.Status;
 import com.fantech.addressmanager.api.entity.Team;
 import com.fantech.addressmanager.api.entity.User;
@@ -71,6 +72,23 @@ public class TeamDAO extends DAO<Team> {
     @Override
     public boolean update(Team obj) {
         return false;
+    }
+
+    @Transactional
+    public boolean updateTeam(UUID teamUuid, UpdateTeamDto teamDto){
+
+        entityManager.joinTransaction();
+        Team team = entityManager.find(Team.class,teamUuid);
+
+        assertNotNull(team);
+        assertNotNull(teamDto);
+        assertNotNull(teamDto.getName());
+
+        team.setName(teamDto.getName());
+
+        entityManager.persist(team);
+        flushAndClear();
+        return true;
     }
 
     @Transactional
