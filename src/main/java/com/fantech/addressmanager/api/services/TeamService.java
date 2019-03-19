@@ -41,12 +41,8 @@ public class TeamService {
             if (user != null) {
 
                 // TODO : findOneByName before saving
-                Team team = new Team();
-                team.setName(teamDto.getName());
-                team.setAdminUuid(UUID.fromString(teamDto.getAdminUuid()));
-                user.getTeams().add(team);
-                userDAO.updateObj(user);
-                return team;
+
+                return teamDAO.createOne(user.getUuid(),teamDto);
 
             }
 
