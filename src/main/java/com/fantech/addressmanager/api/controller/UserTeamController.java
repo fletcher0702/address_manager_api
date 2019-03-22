@@ -79,7 +79,7 @@ public class UserTeamController {
         return zoneService.deleteByUuid(zoneDto);
     }
 
-    @DeleteMapping("/teams/status")
+    @DeleteMapping("/teams/status/delete")
     public Object deleteStatusByUuid(@RequestBody DeleteStatusDto statusDto){
         return teamService.deleteStatus(statusDto);
     }
