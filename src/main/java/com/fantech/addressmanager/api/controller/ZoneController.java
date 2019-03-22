@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("/zones")
+@RequestMapping("/users/teams/zones")
 public class ZoneController {
 
     private ZoneService zoneService;
