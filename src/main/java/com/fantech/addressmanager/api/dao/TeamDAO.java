@@ -15,6 +15,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
@@ -233,14 +236,12 @@ public class TeamDAO extends DAO<Team> {
     @Transactional
     public Status findStatusByUuid(UUID teamUuid, UUID statusUuid){
 
-        Session session = getSession();
-        session.beginTransaction();
-        String hql = "from Status s where s.uuid= :statusUuid and s.team.uuid= :teamUuid";
-        Query q = session.createQuery(hql);
-        q.setParameter("statusUuid",statusUuid);
-        q.setParameter("teamUuid",teamUuid);
-
-        return (Status) q.uniqueResult();
+        CriteriaQuery<Status> criteriaQuery = entityManager.getCriteriaBuilder().createQuery(Status.class);
+        Root<Status> statusRoot = criteriaQuery.from(Status.class);
+        criteriaQuery.select(statusRoot);
+        criteriaQuery.where(entityManager.getCriteriaBuilder().equal(statusRoot.get("team").get("uuid"),teamUuid));
+        criteriaQuery.where(entityManager.getCriteriaBuilder().equal(statusRoot.get("uuid"),statusUuid));
+        return  entityManager.createQuery(criteriaQuery).getSingleResult();
 
     }
 
