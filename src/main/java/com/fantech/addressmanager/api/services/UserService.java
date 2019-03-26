@@ -8,7 +8,9 @@ import com.fantech.addressmanager.api.helpers.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.util.HashMap;
 import java.util.List;
@@ -27,18 +29,23 @@ public class UserService {
         this.authService = authService;
     }
 
-    public Map createUser(UserDto user) {
+    public Map register(UserDto user) {
 
         User userToSave = new User(user.getEmail(), user.getPassword());
+        HashMap<String, Boolean> response = new HashMap<>();
 
         boolean res = userDAO.create(userToSave);
 
         if(res) return authService.jwtClaim(userDAO.findByEmail(user.getEmail()).getUuid().toString());
-        else return null;
+        else {
+            response.put("created", false);
+            return response;
+        }
     }
 
     public Map login(UserDto user) {
 
+        HashMap<String, Boolean> response = new HashMap<>();
         if(user.getEmail()!=null && user.getPassword()!=null){
             User userFound = userDAO.findByEmail(user.getEmail());
 
@@ -46,10 +53,15 @@ public class UserService {
                 boolean match = authService.passwordMatch(user.getPassword(), userFound.getPassword());
                 if (match) return authService.jwtClaim(userFound.getUuid().toString());
             }
+        }else {
+
+            response.put("created", false);
+
         }
-        return null;
+        return response;
     }
 
+    @ResponseStatus(value = HttpStatus.FORBIDDEN, reason = "Invalid token")
     public Object checkJwtIntegrity(HttpHeaders headers){
 
         String token = authService.getToken(headers);

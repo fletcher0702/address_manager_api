@@ -6,6 +6,7 @@ import com.fantech.addressmanager.api.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,7 +27,7 @@ public class UserController {
     @PostMapping(value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE)
     public Map createUser(@RequestBody UserDto user) {
         if (user.getEmail() != null && user.getPassword() != null) {
-            return userService.createUser(user);
+            return userService.register(user);
         } else return null;
 
     }

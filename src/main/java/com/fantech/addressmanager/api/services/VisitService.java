@@ -30,6 +30,7 @@ public class VisitService {
     private VisitDAO visitDAO;
     private ZoneDAO zoneDAO;
     private AddressHelper addressHelper;
+    private HashMap<String,Object> response = new HashMap<>();
 
     @Autowired
     public VisitService(UserDAO userDAO,TeamDAO teamDAO, VisitDAO visitDAO, ZoneDAO zoneDAO, AddressHelper addressHelper) {
@@ -42,6 +43,7 @@ public class VisitService {
 
     public Visit createVisit(VisitDto visitDto) throws IOException {
 
+        response.clear();
 
         if (visitDto.getStatusUuid() != null && visitDto.getAddress() != null && visitDto.getZoneUuid() != null && visitDto.getZoneUuid() != null) {
 
@@ -70,7 +72,8 @@ public class VisitService {
                     visit.setLatitude(coordinates.getLat());
                     visit.setLongitude(coordinates.getLng());
                     visitDAO.create(visit);
-
+                    response.put("created", true);
+                    response.put("content",visit);
                     return visit;
                 }
 
@@ -173,8 +176,9 @@ public class VisitService {
             res.put("message", "Bad credentials send or invalid user");
 
         }
+        res.put("updated",false);
 
-        return false;
+        return res;
     }
     
 }

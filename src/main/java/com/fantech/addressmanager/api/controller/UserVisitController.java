@@ -28,7 +28,7 @@ public class UserVisitController {
         return visitService.findTeamVisits(userUuid);
     }
 
-    @PostMapping("/teams/visits/create")
+    @PostMapping("/teams/zones/visits/create")
     public Visit createVisit(@RequestBody VisitDto visitDto) throws IOException {
         return visitService.createVisit(visitDto);
     }

@@ -55,6 +55,7 @@ public class AuthService {
         JsonObject jwt = new JsonObject();
         jwt.add("uuid", userUuid);
         jwt.add("jwt", jws);
+        jwt.add("created",true);
         JacksonJsonParser jsonParser = new JacksonJsonParser();
         return jsonParser.parseMap(jwt.toString());
     }
