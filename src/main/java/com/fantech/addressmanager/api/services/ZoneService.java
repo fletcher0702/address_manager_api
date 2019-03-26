@@ -29,6 +29,7 @@ public class ZoneService {
     private ZoneDAO zoneDAO;
     private TeamDAO teamDAO;
     private AddressHelper addressHelper;
+    private HashMap<String,Object> response = new HashMap<>();
 
     @Autowired
     public ZoneService(UserDAO userDAO,ZoneDAO zoneDAO, TeamDAO teamDAO, AddressHelper addressHelper) {
@@ -38,8 +39,9 @@ public class ZoneService {
         this.addressHelper = addressHelper;
     }
 
-    public Zone createZone(CreateZoneDto createZoneDto) throws IOException {
+    public Object createZone(CreateZoneDto createZoneDto) throws IOException {
 
+        response.clear();
         if (createZoneDto.getAddress() != null && createZoneDto.getName() != null && createZoneDto.getTeamUuid() != null && createZoneDto.getUserUuid()!=null) {
 
             System.out.println("All Credentials presents...");
@@ -56,12 +58,16 @@ public class ZoneService {
                 zone.setLongitude(coordinates.getLng());
                 zone.setTeam(team);
                 zoneDAO.create(zone);
-                return zone;
+
+                response.put("created",true);
+                response.put("content",zone);
+                return response;
             }
             System.out.println("Related user not found...");
         }
 
-        return null;
+        response.put("created",false);
+        return response;
     }
 
     public List findAll(String userUuid){
@@ -91,14 +97,14 @@ public class ZoneService {
                 return res;
             }
 
-            res.put("updated","Bad Owner Unauthorized");
+            res.put("updated",false);
 
             return res;
 
 
         }catch(Exception e){
             res.put("message","invalid credentials or non existing zone");
-
+            res.put("updated",false);
             return res;
         }
     }
@@ -133,6 +139,7 @@ public class ZoneService {
         assertNotNull(zoneDto.getZoneUuid());
         assertNotNull(zoneDto.getTeamUuid());
 
+        response.clear();
         Team team  = teamDAO.findByUuid(UUID.fromString(zoneDto.getTeamUuid()));
         assertNotNull(team);
 
@@ -146,12 +153,14 @@ public class ZoneService {
 
                 if(Objects.equals(z.getAdminUuid(),UUID.fromString(zoneDto.getUserUuid()))){
 
-                    return zoneDAO.delete(z);
+                    response.put("deleted",zoneDAO.delete(z));
+                    return response;
                 }
 
             }
         }
 
-        return false;
+        response.put("deleted",false);
+        return response;
     }
 }

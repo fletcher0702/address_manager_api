@@ -26,6 +26,7 @@ public class TeamService {
 
     private UserDAO userDAO;
     private TeamDAO teamDAO;
+    private HashMap<String,Object> response = new HashMap<>();
 
     @Autowired
     public TeamService(UserDAO userDAO, TeamDAO teamDAO) {
@@ -35,6 +36,7 @@ public class TeamService {
 
     public Object createTeam(TeamDto teamDto) {
 
+        response.clear();
         if (!teamDto.getAdminUuid().isEmpty() && !teamDto.getName().isEmpty()) {
 
             User user = userDAO.findByUuid(UUID.fromString(teamDto.getAdminUuid()));
@@ -42,7 +44,9 @@ public class TeamService {
 
                 // TODO : findOneByName before saving
 
-                return teamDAO.createOne(user.getUuid(),teamDto);
+                response.put("created",true);
+                response.put("content",teamDAO.createOne(user.getUuid(),teamDto));
+                return response;
 
             }
 
@@ -101,21 +105,23 @@ public class TeamService {
         return false;
     }
 
-    public boolean deleteByUuid(DeleteTeamDto teamDto){
+    public Object deleteByUuid(DeleteTeamDto teamDto){
 
         assertNotNull(teamDto.getTeamUuid());
         assertNotNull(teamDto.getUserUuid());
 
         Team t = teamDAO.findByUuid(UUID.fromString(teamDto.getTeamUuid()));
-
+        response.clear();
         assertNotNull(t);
 
         if(Objects.equals(t.getAdminUuid(),UUID.fromString(teamDto.getUserUuid()))){
 
             teamDAO.delete(t);
-            return true;
+            response.put("deleted",true);
+            return response;
         }
-        return false;
+        response.put("deleted",false);
+        return response;
     }
 
     public Object createStatus(CreateStatusDto statusDto){
@@ -123,14 +129,18 @@ public class TeamService {
         assertNotNull(statusDto.getUserUuid());
         assertNotNull(statusDto.getTeamUuid());
         assertNotNull(statusDto.getStatus());
-
+        response.clear();
         Team t = teamDAO.findByUuid(UUID.fromString(statusDto.getTeamUuid()));
         assertNotNull(t);
 
+
         if(Objects.equals(t.getAdminUuid(),UUID.fromString(statusDto.getUserUuid()))){
-            return teamDAO.addStatus(t.getUuid(),statusDto.getStatus());
+
+            response.put("created",teamDAO.addStatus(t.getUuid(),statusDto.getStatus()));
+            return response;
         }
-        return false;
+        response.put("created",false);
+        return response;
     }
 
 
@@ -142,15 +152,18 @@ public class TeamService {
 
         UUID teamUuid = UUID.fromString(statusDto.getTeamUuid());
         Team team = teamDAO.findByUuid(teamUuid);
+        response.clear();
 
         assertNotNull(team);
 
         if(Objects.equals(team.getAdminUuid(),UUID.fromString(statusDto.getUserUuid()))){
 
-            return teamDAO.deleteStatus(teamUuid,UUID.fromString(statusDto.getStatusUuid()));
+            response.put("deleted",teamDAO.deleteStatus(teamUuid,UUID.fromString(statusDto.getStatusUuid())));
+            return response;
         }
 
-        return false;
+        response.put("deleted",false);
+        return response;
     }
 
     @Transactional
@@ -162,6 +175,7 @@ public class TeamService {
         assertNotNull(statusDto.getStatusUuid());
         assertNotNull(statusDto.getStatus());
 
+        response.clear();
         UUID teamUuid = UUID.fromString(statusDto.getTeamUuid());
 
         Team team = teamDAO.findByUuid(teamUuid);
@@ -173,11 +187,12 @@ public class TeamService {
             Status status = teamDAO.findStatusByUuid(teamUuid,UUID.fromString(statusDto.getStatusUuid()));
 
             assertNotNull(status);
-
-            return teamDAO.updateStatus(status.getUuid(),statusDto.getStatus());
+            response.put("updated",teamDAO.updateStatus(status.getUuid(),statusDto.getStatus()));
+            return response;
         }
 
-        return false;
+        response.put("updated", false);
+        return response;
     }
 
     public Object updateTeam(UpdateTeamDto teamDto){
@@ -187,14 +202,18 @@ public class TeamService {
         assertNotNull(teamDto.getTeamUuid());
         assertNotNull(teamDto.getUserUuid());
 
+        response.clear();
+
         Team team = teamDAO.findByUuid(UUID.fromString(teamDto.getTeamUuid()));
 
         assertNotNull(team);
 
         UUID userUuid = UUID.fromString(teamDto.getUserUuid());
         if(Objects.equals(team.getAdminUuid(),userUuid)){
-            return teamDAO.updateTeam(team.getUuid(),teamDto);
+            response.put("updated",teamDAO.updateTeam(team.getUuid(),teamDto));
+            return response;
         }
-        return false;
+        response.put("updated",false);
+        return response;
     }
 }
