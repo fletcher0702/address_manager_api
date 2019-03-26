@@ -166,7 +166,7 @@ public class TeamService {
         return response;
     }
 
-    @Transactional
+
     public Object updateStatus(UpdateStatusDto statusDto){
 
         assertNotNull(statusDto);
