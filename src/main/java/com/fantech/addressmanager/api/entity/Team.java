@@ -28,6 +28,8 @@ public class Team extends Resource {
     @OneToMany(mappedBy = "team",fetch = FetchType.EAGER,cascade = CascadeType.ALL)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<Status> status;
+    @Transient
+    private boolean isAdmin;
 
     public String getName() {
         return name;
@@ -35,6 +37,10 @@ public class Team extends Resource {
 
     public UUID getAdminUuid() {
         return adminUuid;
+    }
+
+    public boolean isAdmin() {
+        return isAdmin;
     }
 
     public Set<User> getUsers() {
@@ -59,5 +65,9 @@ public class Team extends Resource {
 
     public void setUsers(Set<User> users) {
         this.users = users;
+    }
+
+    public void setAdmin(boolean admin) {
+        isAdmin = admin;
     }
 }
