@@ -50,18 +50,23 @@ public class ZoneService {
             User user = userDAO.findByUuid(UUID.fromString(createZoneDto.getUserUuid()));
             if (team != null && user !=null) {
                 System.out.println("Related Team found...");
-                Zone zone = new Zone();
-                Coordinates coordinates = addressHelper.getCoordinates(createZoneDto.getAddress());
-                zone.setAdminUuid(UUID.fromString(createZoneDto.getUserUuid()));
-                zone.setName(createZoneDto.getName());
-                zone.setLatitude(coordinates.getLat());
-                zone.setLongitude(coordinates.getLng());
-                zone.setTeam(team);
-                zoneDAO.create(zone);
 
-                response.put("created",true);
-                response.put("content",zone);
-                return response;
+                if(Objects.equals(team.getAdminUuid(),UUID.fromString(createZoneDto.getUserUuid()))){
+
+                    Zone zone = new Zone();
+                    Coordinates coordinates = addressHelper.getCoordinates(createZoneDto.getAddress());
+                    zone.setAdminUuid(UUID.fromString(createZoneDto.getUserUuid()));
+                    zone.setName(createZoneDto.getName());
+                    zone.setLatitude(coordinates.getLat());
+                    zone.setLongitude(coordinates.getLng());
+                    zone.setTeam(team);
+                    zoneDAO.create(zone);
+
+                    response.put("created",true);
+                    response.put("content",zone);
+                    return response;
+                }
+
             }
             System.out.println("Related user not found...");
         }
