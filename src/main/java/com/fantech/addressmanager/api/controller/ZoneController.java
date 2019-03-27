@@ -3,6 +3,7 @@ package com.fantech.addressmanager.api.controller;
 import com.fantech.addressmanager.api.dto.zone.CreateZoneDto;
 import com.fantech.addressmanager.api.services.ZoneService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +20,7 @@ public class ZoneController {
         this.zoneService = zoneService;
     }
 
+    @ResponseStatus(value = HttpStatus.FORBIDDEN, reason = "Bad Owner")
     @PostMapping(value = "/create", consumes = MediaType.APPLICATION_JSON_VALUE)
     public Object createZone(@RequestBody CreateZoneDto zone) throws IOException {
         return zoneService.createZone(zone);
