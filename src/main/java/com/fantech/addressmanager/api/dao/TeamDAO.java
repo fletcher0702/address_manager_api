@@ -9,13 +9,11 @@ import com.fantech.addressmanager.api.entity.User;
 import com.fantech.addressmanager.api.entity.Zone;
 import com.fantech.addressmanager.api.util.HibernateUtilConfiguration;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import javax.transaction.Transactional;
@@ -189,7 +187,10 @@ public class TeamDAO extends DAO<Team> {
         List<Team> toReturn = new ArrayList<>();
         for (Team team : res) {
             for (User user : team.getUsers()) {
-                if (Objects.equals(user.getUuid(), userUuid)) toReturn.add(team);
+                if (Objects.equals(user.getUuid(), userUuid)){
+                    team.setAdmin(Objects.equals(team.getAdminUuid(),userUuid));
+                    toReturn.add(team);
+                }
             }
             if (!Objects.equals(team.getAdminUuid(), userUuid)) team.getUsers().clear();
         }
