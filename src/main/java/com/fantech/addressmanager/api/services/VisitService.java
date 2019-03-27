@@ -41,7 +41,7 @@ public class VisitService {
         this.addressHelper = addressHelper;
     }
 
-    public Visit createVisit(VisitDto visitDto) throws IOException {
+    public Object createVisit(VisitDto visitDto) throws IOException {
 
         response.clear();
 
@@ -74,13 +74,14 @@ public class VisitService {
                     visitDAO.create(visit);
                     response.put("created", true);
                     response.put("content",visit);
-                    return visit;
+                    return response;
                 }
 
             }
 
         }
-        return null;
+        response.put("created",false);
+        return response;
     }
 
     public List findTeamVisits(String teamUuid) {
@@ -163,22 +164,24 @@ public class VisitService {
                 Team team = teamDAO.findByUuid(UUID.fromString(visitDto.getTeamUuid()));
                 assertNotNull(team);
                 assertNotNull(visitDto.getStatusUuid());
-
                 if(teamDAO.userBelongsToTeam(team.getUuid(),user.getUuid())) {
                     res.put("updated",visitDAO.updateVisitStatus(UUID.fromString(visitDto.getVisitUuid()),UUID.fromString(visitDto.getStatusUuid())));
-                }else res.put("update","User not found");
+                }else{
+
+                    res.put("update",false);
+                    res.put("message","User not found");
+                }
+
             }
 
             return res;
 
         }catch(Exception e){
 
+            res.put("updated",false);
             res.put("message", "Bad credentials send or invalid user");
-
+            return res;
         }
-        res.put("updated",false);
-
-        return res;
     }
     
 }
