@@ -6,6 +6,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Set;
 import java.util.UUID;
 
@@ -28,8 +29,12 @@ public class Team extends Resource {
     @OneToMany(mappedBy = "team",fetch = FetchType.EAGER,cascade = CascadeType.ALL)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<Status> status;
+
     @Transient
     private boolean isAdmin;
+
+    @Transient
+    private ArrayList<String> emails = new ArrayList<>();
 
     public String getName() {
         return name;
@@ -53,6 +58,10 @@ public class Team extends Resource {
 
     public Set<Status> getStatus() {
         return status;
+    }
+
+    public ArrayList<String> getEmails() {
+        return emails;
     }
 
     public void setName(String name) {
