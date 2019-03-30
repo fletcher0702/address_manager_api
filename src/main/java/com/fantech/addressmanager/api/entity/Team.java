@@ -23,7 +23,6 @@ public class Team extends Resource {
     @OneToMany(mappedBy = "team",fetch = FetchType.EAGER)
     private Set<Zone> zones;
 
-    @JsonIgnore
     @ManyToMany(mappedBy = "teams",fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST,CascadeType.MERGE})
     private Set<User> users;
 
