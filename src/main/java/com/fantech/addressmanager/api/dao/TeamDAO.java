@@ -187,7 +187,7 @@ public class TeamDAO extends DAO<Team> {
         List<Team> toReturn = new ArrayList<>();
         for (Team team : res) {
             for (User user : team.getUsers()) {
-                if (Objects.equals(user.getUuid(), userUuid)){
+                if (Objects.equals(team.getAdminUuid(), userUuid)){
                     team.setAdmin(Objects.equals(team.getAdminUuid(),userUuid));
                     team.getEmails().add(user.getEmail());
                     toReturn.add(team);
