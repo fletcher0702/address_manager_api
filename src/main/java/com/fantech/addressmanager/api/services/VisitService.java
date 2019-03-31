@@ -45,7 +45,7 @@ public class VisitService {
 
         response.clear();
 
-        if (visitDto.getStatusUuid() != null && visitDto.getAddress() != null && visitDto.getZoneUuid() != null && visitDto.getZoneUuid() != null) {
+        if (visitDto.getStatusUuid() != null && visitDto.getAddress() != null && visitDto.getZoneUuid() != null && visitDto.getZoneUuid() != null && visitDto.getDate()!=null) {
 
             System.out.println("Credentials controls passed...");
             Team team = teamDAO.findByUuid(UUID.fromString(visitDto.getTeamUuid()));
@@ -63,6 +63,8 @@ public class VisitService {
                     System.out.println("Status found...");
                     Visit visit = new Visit();
                     Coordinates coordinates = addressHelper.getCoordinates(visitDto.getAddress());
+                    History history = new History();
+                    history.getHistory().add(visitDto.getDate());
                     visit.setName(visitDto.getName());
                     visit.setAddress(visitDto.getAddress());
                     visit.setStatus(status);
@@ -71,6 +73,8 @@ public class VisitService {
                     visit.setZone(zone);
                     visit.setLatitude(coordinates.getLat());
                     visit.setLongitude(coordinates.getLng());
+                    visit.setHistory(history);
+                    if(visitDto.getObservation()!=null) visit.setObservation(visitDto.getObservation());
                     visitDAO.create(visit);
                     response.put("created", true);
                     response.put("content",visit);
