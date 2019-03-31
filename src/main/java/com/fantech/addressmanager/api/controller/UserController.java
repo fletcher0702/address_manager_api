@@ -24,6 +24,11 @@ public class UserController {
         this.userService = userService;
     }
 
+    @GetMapping("/{userUuid}")
+    public Object findOne(@PathVariable("userUuid") String userUuid){
+        return userService.findOne(userUuid);
+    }
+
     @PostMapping(value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE)
     public Map createUser(@RequestBody UserDto user) {
         if (user.getEmail() != null && user.getPassword() != null) {

@@ -20,7 +20,7 @@ public class ZoneController {
         this.zoneService = zoneService;
     }
 
-    @ResponseStatus(value = HttpStatus.FORBIDDEN, reason = "Bad Owner")
+   
     @PostMapping(value = "/create", consumes = MediaType.APPLICATION_JSON_VALUE)
     public Object createZone(@RequestBody CreateZoneDto zone) throws IOException {
         return zoneService.createZone(zone);

@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @Component
 
@@ -69,7 +70,17 @@ public class UserService {
         if(!token.isEmpty()){
 
             try{
-                return authService.decodeJwt(token);
+                res = authService.decodeJwt(token);
+                if((boolean)res.get("valid")){
+                    User u = userDAO.findByUuid(UUID.fromString((String) res.get("uuid")));
+                    if(u!=null){
+
+                        res.putIfAbsent("valid",true);
+                    }else{
+                        res.putIfAbsent("valid",false);
+                    }
+                }
+                return res;
             }catch(Exception e){
                 res.put("valid", false);
                 e.printStackTrace();
@@ -82,5 +93,22 @@ public class UserService {
 
     public List findAll(){
         return userDAO.findAll();
+    }
+
+    public Object findOne(String userUuid){
+
+        User u = userDAO.findByUuid(UUID.fromString(userUuid));
+
+        HashMap<String,Object> res = new HashMap<>();
+
+        if(u!=null){
+            res.putIfAbsent("exist",true);
+            res.put("email",u.getEmail());
+            return  res;
+        }
+
+        res.put("exist",false);
+
+        return res;
     }
 }

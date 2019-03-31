@@ -191,8 +191,9 @@ public class TeamDAO extends DAO<Team> {
                     team.setAdmin(Objects.equals(team.getAdminUuid(),userUuid));
                     toReturn.add(team);
                 }
+                team.getEmails().add(user.getEmail());
             }
-            if (!Objects.equals(team.getAdminUuid(), userUuid)) team.getUsers().clear();
+
         }
 
         return toReturn;
