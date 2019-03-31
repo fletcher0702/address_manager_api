@@ -8,9 +8,9 @@ import java.util.ArrayList;
 @Entity
 public class History extends Resource {
 
-    private ArrayList<String> history = new ArrayList<>();
+    private ArrayList<String> dates = new ArrayList<>();
 
     public ArrayList<String> getHistory() {
-        return history;
+        return dates;
     }
 }
