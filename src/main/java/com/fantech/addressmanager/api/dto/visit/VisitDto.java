@@ -7,7 +7,17 @@ public class VisitDto {
     private String name;
     private String address;
     private String zoneUuid;
+    private String date;
+    private String observation;
     private String phoneNumber;
+
+    public String getDate() {
+        return date;
+    }
+
+    public String getObservation() {
+        return observation;
+    }
 
     public String getName() {
         return name;

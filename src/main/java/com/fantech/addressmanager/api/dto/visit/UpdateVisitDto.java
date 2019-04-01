@@ -11,6 +11,7 @@ public class UpdateVisitDto {
     private String visitUuid;
     private String statusUuid;
     private String name;
+    private String date;
     @JsonIgnore
     private String address;
     @JsonIgnore
@@ -46,5 +47,9 @@ public class UpdateVisitDto {
 
     public String getPhoneNumber() {
         return phoneNumber;
+    }
+
+    public String getDate() {
+        return date;
     }
 }

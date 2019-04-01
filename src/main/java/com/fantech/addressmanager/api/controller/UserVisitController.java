@@ -2,6 +2,7 @@ package com.fantech.addressmanager.api.controller;
 
 import com.fantech.addressmanager.api.dto.visit.DeleteVisitDto;
 import com.fantech.addressmanager.api.dto.visit.UpdateVisitDto;
+import com.fantech.addressmanager.api.dto.visit.UpdateVisitHistoryDto;
 import com.fantech.addressmanager.api.dto.visit.VisitDto;
 import com.fantech.addressmanager.api.entity.Visit;
 import com.fantech.addressmanager.api.services.VisitService;
@@ -37,6 +38,12 @@ public class UserVisitController {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public Object updateVisit(@RequestBody UpdateVisitDto visitDto) {
         return visitService.updateVisitByUuid(visitDto);
+    }
+
+    @PatchMapping("/teams/zones/visits/update/history")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public Object updateVisitHistory(@RequestBody UpdateVisitHistoryDto visitDto) {
+        return visitService.updateVisitHistory(visitDto);
     }
 
     @DeleteMapping("/teams/zones/visits/delete")

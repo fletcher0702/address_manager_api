@@ -21,6 +21,14 @@ public class Visit extends Resource {
     @OneToOne(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
     @JoinColumn
     private Status status;
+
+    @OneToOne(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
+    @JoinColumn
+    private History history;
+
+    @Column(name="observation")
+    private String observation;
+
     @Column(name="latitude")
     private double latitude;
     @Column(name="longitude")
@@ -80,5 +88,21 @@ public class Visit extends Resource {
 
     public void setZone(Zone zone) {
         this.zone = zone;
+    }
+
+    public History getHistory() {
+        return history;
+    }
+
+    public String getObservation() {
+        return observation;
+    }
+
+    public void setHistory(History history) {
+        this.history = history;
+    }
+
+    public void setObservation(String observation) {
+        this.observation = observation;
     }
 }
