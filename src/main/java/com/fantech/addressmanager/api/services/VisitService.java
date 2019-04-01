@@ -4,10 +4,7 @@ import com.fantech.addressmanager.api.dao.TeamDAO;
 import com.fantech.addressmanager.api.dao.UserDAO;
 import com.fantech.addressmanager.api.dao.VisitDAO;
 import com.fantech.addressmanager.api.dao.ZoneDAO;
-import com.fantech.addressmanager.api.dto.visit.DeleteVisitDto;
-import com.fantech.addressmanager.api.dto.visit.UpdateVisitDto;
-import com.fantech.addressmanager.api.dto.visit.UpdateVisitHistoryDto;
-import com.fantech.addressmanager.api.dto.visit.VisitDto;
+import com.fantech.addressmanager.api.dto.visit.*;
 import com.fantech.addressmanager.api.entity.*;
 import com.fantech.addressmanager.api.entity.common.Coordinates;
 import com.fantech.addressmanager.api.helpers.AddressHelper;
@@ -228,6 +225,44 @@ public class VisitService {
 
             e.printStackTrace();
             res.put("updated",false);
+            res.put("message", "Bad credentials send or invalid user");
+            return res;
+        }
+    }
+
+    public Object deleteHistoryDate(DeleteHistoryDateDto visitDto){
+
+        HashMap<String,Object> res = new HashMap<>();
+        try{
+
+            assertNotNull(visitDto);
+            assertNotNull(visitDto.getUserUuid());
+            assertNotNull(visitDto.getTeamUuid());
+            assertNotNull(visitDto.getVisitUuid());
+            assertNotNull(visitDto.getZoneUuid());
+
+            Zone zone = zoneDAO.findZoneByTeamUuid(UUID.fromString(visitDto.getTeamUuid()),UUID.fromString(visitDto.getZoneUuid()));
+
+            assertNotNull(zone);
+
+            UUID visitUuid = UUID.fromString(visitDto.getVisitUuid());
+            User user = userDAO.findByUuid(UUID.fromString(visitDto.getUserUuid()));
+            assertNotNull(user);
+            Team team = teamDAO.findByUuid(UUID.fromString(visitDto.getTeamUuid()));
+            assertNotNull(team);
+            if(teamDAO.userBelongsToTeam(team.getUuid(),user.getUuid())) {
+                res.put("deleted",visitDAO.deleteHistoryDate(visitUuid,visitDto.getDate()));
+            }else{
+                res.put("deleted",false);
+                res.put("message","User not found");
+            }
+
+            return res;
+
+        }catch(Exception e){
+
+            e.printStackTrace();
+            res.put("deleted",false);
             res.put("message", "Bad credentials send or invalid user");
             return res;
         }
