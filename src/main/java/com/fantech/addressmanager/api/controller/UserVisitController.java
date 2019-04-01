@@ -1,9 +1,6 @@
 package com.fantech.addressmanager.api.controller;
 
-import com.fantech.addressmanager.api.dto.visit.DeleteVisitDto;
-import com.fantech.addressmanager.api.dto.visit.UpdateVisitDto;
-import com.fantech.addressmanager.api.dto.visit.UpdateVisitHistoryDto;
-import com.fantech.addressmanager.api.dto.visit.VisitDto;
+import com.fantech.addressmanager.api.dto.visit.*;
 import com.fantech.addressmanager.api.entity.Visit;
 import com.fantech.addressmanager.api.services.VisitService;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -44,6 +41,11 @@ public class UserVisitController {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public Object updateVisitHistory(@RequestBody UpdateVisitHistoryDto visitDto) {
         return visitService.updateVisitHistory(visitDto);
+    }
+
+    @DeleteMapping("/teams/zones/visits/history/delete")
+    public Object deleteHistoryDate(@RequestBody DeleteHistoryDateDto visitDto) {
+        return visitService.deleteHistoryDate(visitDto);
     }
 
     @DeleteMapping("/teams/zones/visits/delete")

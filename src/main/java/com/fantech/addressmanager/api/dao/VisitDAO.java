@@ -206,4 +206,28 @@ public class VisitDAO extends DAO<Visit>{
 
         return true;
     }
+
+    @Transactional
+    public boolean deleteHistoryDate(UUID visitUuid,String date){
+        entityManager.joinTransaction();
+        Visit v = entityManager.find(Visit.class,visitUuid);
+        assertNotNull(v);
+        assertNotNull(date);
+        if(!date.isEmpty()){
+            boolean isPresent = false;
+            int position = -1;
+            for (String s : v.getHistory().getDates()) {
+                if(Objects.equals(s,date)) {
+                    isPresent =true;
+                    position = v.getHistory().getDates().indexOf(s);
+                }
+            }
+            if(isPresent) v.getHistory().getDates().remove(position);
+        }
+
+        entityManager.persist(v);
+        flushAndClear();
+
+        return true;
+    }
 }
