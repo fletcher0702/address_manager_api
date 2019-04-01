@@ -1,6 +1,7 @@
 package com.fantech.addressmanager.api.dao;
 
 import com.fantech.addressmanager.api.dto.visit.UpdateVisitDto;
+import com.fantech.addressmanager.api.entity.History;
 import com.fantech.addressmanager.api.entity.Status;
 import com.fantech.addressmanager.api.entity.Visit;
 import com.fantech.addressmanager.api.entity.Zone;
@@ -165,6 +166,9 @@ public class VisitDAO extends DAO<Visit>{
         assertNotNull(date);
         if(!date.isEmpty()){
 
+            if(v.getHistory() == null){
+                v.setHistory(new History());
+            }
             boolean present = false;
             for (String s : v.getHistory().getDates()) {
                 if(Objects.equals(s,date)) present = true;
