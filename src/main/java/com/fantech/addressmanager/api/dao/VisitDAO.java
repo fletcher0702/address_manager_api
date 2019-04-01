@@ -121,7 +121,11 @@ public class VisitDAO extends DAO<Visit>{
         }
 
         if(visitDto.getDate()!=null && !visitDto.getDate().isEmpty()){
-            v.getHistory().getDates().add(visitDto.getDate());
+
+            if(v.getHistory() == null){
+                v.setHistory(new History());
+                v.getHistory().getDates().add(visitDto.getDate());
+            }
         }
 
         if(visitDto.getObservation()!=null && !visitDto.getObservation().isEmpty()){
@@ -162,7 +166,7 @@ public class VisitDAO extends DAO<Visit>{
         return true;
     }
 
-    @Transactional
+    @Transactional(Transactional.TxType.REQUIRES_NEW)
     public boolean updateVisitHistory(UUID visitUuid,String date){
         entityManager.joinTransaction();
         Visit v = entityManager.find(Visit.class,visitUuid);
@@ -187,7 +191,7 @@ public class VisitDAO extends DAO<Visit>{
         return true;
     }
 
-    @Transactional
+    @Transactional(Transactional.TxType.REQUIRES_NEW)
     public boolean updateVisitObservation(UUID visitUuid,String observation){
         entityManager.joinTransaction();
         Visit v = entityManager.find(Visit.class,visitUuid);

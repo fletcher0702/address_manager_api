@@ -186,6 +186,7 @@ public class VisitService {
 
         }catch(Exception e){
 
+            e.printStackTrace();
             res.put("updated",false);
             res.put("message", "Bad credentials send or invalid user");
             return res;
@@ -225,6 +226,7 @@ public class VisitService {
 
         }catch(Exception e){
 
+            e.printStackTrace();
             res.put("updated",false);
             res.put("message", "Bad credentials send or invalid user");
             return res;
