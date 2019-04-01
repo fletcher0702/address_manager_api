@@ -124,6 +124,10 @@ public class VisitDAO extends DAO<Visit>{
             v.getHistory().getDates().add(visitDto.getDate());
         }
 
+        if(visitDto.getObservation()!=null && !visitDto.getObservation().isEmpty()){
+            v.setObservation(visitDto.getObservation());
+        }
+
         Zone zone = entityManager.find(Zone.class,UUID.fromString(visitDto.getZoneUuid()));
 
         assertNotNull(zone);
@@ -175,6 +179,22 @@ public class VisitDAO extends DAO<Visit>{
             }
 
             if(!present) v.getHistory().getDates().add(date);
+        }
+
+        entityManager.persist(v);
+        flushAndClear();
+
+        return true;
+    }
+
+    @Transactional
+    public boolean updateVisitObservation(UUID visitUuid,String observation){
+        entityManager.joinTransaction();
+        Visit v = entityManager.find(Visit.class,visitUuid);
+        assertNotNull(v);
+        assertNotNull(observation);
+        if(!observation.isEmpty()){
+            v.setObservation(observation);
         }
 
         entityManager.persist(v);
