@@ -10,6 +10,7 @@ public class UpdateVisitDto {
     private String zoneUuid;
     private String visitUuid;
     private String statusUuid;
+    private String observation;
     private String name;
     private String date;
     @JsonIgnore
@@ -51,5 +52,9 @@ public class UpdateVisitDto {
 
     public String getDate() {
         return date;
+    }
+
+    public String getObservation() {
+        return observation;
     }
 }

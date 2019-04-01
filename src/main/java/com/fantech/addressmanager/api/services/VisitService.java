@@ -172,6 +172,7 @@ public class VisitService {
                 assertNotNull(visitDto.getStatusUuid());
                 if(teamDAO.userBelongsToTeam(team.getUuid(),user.getUuid())) {
                     visitDAO.updateVisitHistory(visitUuid,visitDto.getDate());
+                    visitDAO.updateVisitObservation(visitUuid,visitDto.getObservation());
                     res.put("updated",visitDAO.updateVisitStatus(visitUuid,UUID.fromString(visitDto.getStatusUuid())));
                 }else{
 
