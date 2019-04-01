@@ -10,7 +10,7 @@ public class History extends Resource {
 
     private ArrayList<String> dates = new ArrayList<>();
 
-    public ArrayList<String> getHistory() {
+    public ArrayList<String> getDates() {
         return dates;
     }
 }

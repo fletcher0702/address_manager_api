@@ -6,6 +6,7 @@ import com.fantech.addressmanager.api.dao.VisitDAO;
 import com.fantech.addressmanager.api.dao.ZoneDAO;
 import com.fantech.addressmanager.api.dto.visit.DeleteVisitDto;
 import com.fantech.addressmanager.api.dto.visit.UpdateVisitDto;
+import com.fantech.addressmanager.api.dto.visit.UpdateVisitHistoryDto;
 import com.fantech.addressmanager.api.dto.visit.VisitDto;
 import com.fantech.addressmanager.api.entity.*;
 import com.fantech.addressmanager.api.entity.common.Coordinates;
@@ -64,7 +65,7 @@ public class VisitService {
                     Visit visit = new Visit();
                     Coordinates coordinates = addressHelper.getCoordinates(visitDto.getAddress());
                     History history = new History();
-                    history.getHistory().add(visitDto.getDate());
+                    history.getDates().add(visitDto.getDate());
                     visit.setName(visitDto.getName());
                     visit.setAddress(visitDto.getAddress());
                     visit.setStatus(status);
@@ -150,6 +151,7 @@ public class VisitService {
 
             assertNotNull(zone);
 
+            UUID visitUuid = UUID.fromString(visitDto.getVisitUuid());
             if(Objects.equals(zone.getAdminUuid(),UUID.fromString(visitDto.getUserUuid()))){
 
                 System.out.println("In the if condition of administrator !");
@@ -159,7 +161,7 @@ public class VisitService {
                     if(!visitDto.getAddress().isEmpty()) coordinates = addressHelper.getCoordinates(visitDto.getAddress());
                 }
                 System.out.println("Good owner requester !");
-                res.put("updated",visitDAO.updateVisitByUuidAdmin(UUID.fromString(visitDto.getVisitUuid()),visitDto,coordinates));
+                res.put("updated",visitDAO.updateVisitByUuidAdmin(visitUuid,visitDto,coordinates));
 
             }else {
                 System.out.println("Not an admin...");
@@ -169,7 +171,8 @@ public class VisitService {
                 assertNotNull(team);
                 assertNotNull(visitDto.getStatusUuid());
                 if(teamDAO.userBelongsToTeam(team.getUuid(),user.getUuid())) {
-                    res.put("updated",visitDAO.updateVisitStatus(UUID.fromString(visitDto.getVisitUuid()),UUID.fromString(visitDto.getStatusUuid())));
+                    visitDAO.updateVisitHistory(visitUuid,visitDto.getDate());
+                    res.put("updated",visitDAO.updateVisitStatus(visitUuid,UUID.fromString(visitDto.getStatusUuid())));
                 }else{
 
                     res.put("update",false);
@@ -177,6 +180,45 @@ public class VisitService {
                 }
 
             }
+
+            return res;
+
+        }catch(Exception e){
+
+            res.put("updated",false);
+            res.put("message", "Bad credentials send or invalid user");
+            return res;
+        }
+    }
+
+    public Object updateVisitHistory(UpdateVisitHistoryDto visitDto){
+
+        HashMap<String,Object> res = new HashMap<>();
+        try{
+
+            assertNotNull(visitDto);
+            assertNotNull(visitDto.getUserUuid());
+            assertNotNull(visitDto.getTeamUuid());
+            assertNotNull(visitDto.getVisitUuid());
+            assertNotNull(visitDto.getZoneUuid());
+
+            Zone zone = zoneDAO.findZoneByTeamUuid(UUID.fromString(visitDto.getTeamUuid()),UUID.fromString(visitDto.getZoneUuid()));
+
+            assertNotNull(zone);
+
+            UUID visitUuid = UUID.fromString(visitDto.getVisitUuid());
+            User user = userDAO.findByUuid(UUID.fromString(visitDto.getUserUuid()));
+            assertNotNull(user);
+            Team team = teamDAO.findByUuid(UUID.fromString(visitDto.getTeamUuid()));
+            assertNotNull(team);
+            if(teamDAO.userBelongsToTeam(team.getUuid(),user.getUuid())) {
+                res.put("updated",visitDAO.updateVisitHistory(visitUuid,visitDto.getDate()));
+            }else{
+                res.put("update",false);
+                res.put("message","User not found");
+            }
+
+
 
             return res;
 
