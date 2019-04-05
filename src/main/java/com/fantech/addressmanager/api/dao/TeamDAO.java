@@ -9,6 +9,7 @@ import com.fantech.addressmanager.api.entity.User;
 import com.fantech.addressmanager.api.entity.Zone;
 import com.fantech.addressmanager.api.util.HibernateUtilConfiguration;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -21,6 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -165,6 +168,36 @@ public class TeamDAO extends DAO<Team> {
 
     }
 
+
+    @Transactional(Transactional.TxType.REQUIRES_NEW)
+    public boolean removeUserInTeam(UUID teamUuid, UUID userToRemove){
+        entityManager.joinTransaction();
+
+        Team team = entityManager.find(Team.class,teamUuid);
+        User u = entityManager.find(User.class,userToRemove);
+
+        boolean removed = team.getUsers().remove(u);
+
+//        entityManager.persist(team);
+        entityManager.merge(team);
+        flushAndClear();
+
+//        Session session = sessionFactory.openSession();
+//        Transaction tx = session.beginTransaction();
+//        Team t = session.get(Team.class,teamUuid);
+//        assertNotNull(t);
+//        User u = session.get(User.class,userToRemove);
+//        assertNotNull(u);
+//        System.out.println("Length before "+ t.getUsers().size());
+//        boolean removed = t.getUsers().remove(u);
+//        System.out.println("Length after "+ t.getUsers().size());
+//        session.persist(t);
+//        session.flush();
+//        tx.commit();
+
+        return removed;
+    }
+
     public Team findUserTeamByUuid(UUID userUuid, UUID teamUuid) {
         Session session = this.sessionFactory.openSession();
         String hql = "from Team t where t.adminUuid =:userUuid and t.uuid =:teamUuid";
@@ -185,13 +218,15 @@ public class TeamDAO extends DAO<Team> {
 
         List<Team> res = q.list();
         List<Team> toReturn = new ArrayList<>();
+
         for (Team team : res) {
+            System.out.println("Team users length : " + team.getUsers().size());
             for (User user : team.getUsers()) {
                 if (Objects.equals(user.getUuid(), userUuid)){
                     team.setAdmin(Objects.equals(team.getAdminUuid(),userUuid));
                     toReturn.add(team);
                 }
-                team.getEmails().add(user.getEmail());
+                if(!Objects.equals(user.getUuid(),userUuid)) team.getEmails().add(user.getEmail());
             }
 
         }

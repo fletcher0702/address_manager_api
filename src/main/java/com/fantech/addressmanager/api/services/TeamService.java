@@ -5,10 +5,7 @@ import com.fantech.addressmanager.api.dao.UserDAO;
 import com.fantech.addressmanager.api.dto.status.CreateStatusDto;
 import com.fantech.addressmanager.api.dto.status.DeleteStatusDto;
 import com.fantech.addressmanager.api.dto.status.UpdateStatusDto;
-import com.fantech.addressmanager.api.dto.team.DeleteTeamDto;
-import com.fantech.addressmanager.api.dto.team.InviteUsersDto;
-import com.fantech.addressmanager.api.dto.team.TeamDto;
-import com.fantech.addressmanager.api.dto.team.UpdateTeamDto;
+import com.fantech.addressmanager.api.dto.team.*;
 import com.fantech.addressmanager.api.entity.Status;
 import com.fantech.addressmanager.api.entity.Team;
 import com.fantech.addressmanager.api.entity.User;
@@ -95,14 +92,43 @@ public class TeamService {
         return null;
     }
 
+    public Object removeUserInTeam(UninviteUserDto uninviteUserDto){
+
+        response.clear();
+
+        assertNotNull(uninviteUserDto);
+        assertNotNull(uninviteUserDto.getEmail());
+        assertNotNull(uninviteUserDto.getTeamUuid());
+        assertNotNull(uninviteUserDto.getUserUuid());
+
+
+        Team t = teamDAO.findByUuid(UUID.fromString(uninviteUserDto.getTeamUuid()));
+
+        assertNotNull(t);
+
+        UUID userUuid = UUID.fromString(uninviteUserDto.getUserUuid());
+
+        if(Objects.equals(t.getAdminUuid(),userUuid)){
+
+            User toRemove = userDAO.findByEmail(uninviteUserDto.getEmail());
+            assertNotNull(toRemove);
+
+            System.out.println("User to delete found...");
+
+            response.put("present",teamDAO.removeUserInTeam(t.getUuid(),toRemove.getUuid()));
+
+
+            return response;
+        }
+
+        response.put("present",false);
+
+        return response;
+    }
+
     public Object findAllTeamByUserUuid(String userUuid){
 
         return teamDAO.findUserRelatedTeam(UUID.fromString(userUuid));
-    }
-
-    private boolean elligible() {
-
-        return false;
     }
 
     public Object deleteByUuid(DeleteTeamDto teamDto){
