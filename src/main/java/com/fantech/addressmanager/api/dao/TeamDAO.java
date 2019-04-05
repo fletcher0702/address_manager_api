@@ -9,6 +9,7 @@ import com.fantech.addressmanager.api.entity.User;
 import com.fantech.addressmanager.api.entity.Zone;
 import com.fantech.addressmanager.api.util.HibernateUtilConfiguration;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -21,6 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -165,6 +168,19 @@ public class TeamDAO extends DAO<Team> {
 
     }
 
+
+    @Transactional
+    public boolean removeUserInTeam(UUID teamUuid, UUID userToRemove){
+        entityManager.joinTransaction();
+
+        Team team = entityManager.find(Team.class,teamUuid);
+        User u = entityManager.find(User.class,userToRemove);
+        boolean removed = u.getTeams().remove(team);
+        entityManager.persist(team);
+        flushAndClear();
+        return removed;
+    }
+
     public Team findUserTeamByUuid(UUID userUuid, UUID teamUuid) {
         Session session = this.sessionFactory.openSession();
         String hql = "from Team t where t.adminUuid =:userUuid and t.uuid =:teamUuid";
@@ -185,13 +201,18 @@ public class TeamDAO extends DAO<Team> {
 
         List<Team> res = q.list();
         List<Team> toReturn = new ArrayList<>();
+
         for (Team team : res) {
+            System.out.println("Team users length : " + team.getUsers().size());
             for (User user : team.getUsers()) {
                 if (Objects.equals(user.getUuid(), userUuid)){
                     team.setAdmin(Objects.equals(team.getAdminUuid(),userUuid));
                     toReturn.add(team);
                 }
-                team.getEmails().add(user.getEmail());
+                if(!Objects.equals(user.getUuid(),userUuid)){
+                    team.getEmails().add(user.getEmail());
+                    System.out.println("Team size : " + user.getTeams().size());
+                }
             }
 
         }

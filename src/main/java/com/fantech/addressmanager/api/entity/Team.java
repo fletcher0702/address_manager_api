@@ -24,7 +24,7 @@ public class Team extends Resource {
     private Set<Zone> zones;
 
     @JsonIgnore
-    @ManyToMany(mappedBy = "teams",fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST,CascadeType.MERGE})
+    @ManyToMany(mappedBy = "teams",fetch = FetchType.EAGER, cascade = {CascadeType.ALL})
     private Set<User> users;
 
     @OneToMany(mappedBy = "team",fetch = FetchType.EAGER,cascade = CascadeType.ALL)
