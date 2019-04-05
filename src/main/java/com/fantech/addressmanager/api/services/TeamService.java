@@ -96,28 +96,34 @@ public class TeamService {
 
         response.clear();
 
-        assertNotNull(uninviteUserDto);
-        assertNotNull(uninviteUserDto.getEmail());
-        assertNotNull(uninviteUserDto.getTeamUuid());
-        assertNotNull(uninviteUserDto.getUserUuid());
+        try{
+            assertNotNull(uninviteUserDto);
+            assertNotNull(uninviteUserDto.getEmail());
+            assertNotNull(uninviteUserDto.getTeamUuid());
+            assertNotNull(uninviteUserDto.getUserUuid());
 
 
-        Team t = teamDAO.findByUuid(UUID.fromString(uninviteUserDto.getTeamUuid()));
+            Team t = teamDAO.findByUuid(UUID.fromString(uninviteUserDto.getTeamUuid()));
 
-        assertNotNull(t);
+            assertNotNull(t);
 
-        UUID userUuid = UUID.fromString(uninviteUserDto.getUserUuid());
+            UUID userUuid = UUID.fromString(uninviteUserDto.getUserUuid());
 
-        if(Objects.equals(t.getAdminUuid(),userUuid)){
+            if(Objects.equals(t.getAdminUuid(),userUuid)){
 
-            User toRemove = userDAO.findByEmail(uninviteUserDto.getEmail());
-            assertNotNull(toRemove);
+                User toRemove = userDAO.findByEmail(uninviteUserDto.getEmail());
+                assertNotNull(toRemove);
 
-            System.out.println("User to delete found...");
+                System.out.println("User to delete found...");
 
-            response.put("present",teamDAO.removeUserInTeam(t.getUuid(),toRemove.getUuid()));
+                response.put("present",teamDAO.removeUserInTeam(t.getUuid(),toRemove.getUuid()));
 
 
+                return response;
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            response.put("present",false);
             return response;
         }
 

@@ -169,32 +169,15 @@ public class TeamDAO extends DAO<Team> {
     }
 
 
-    @Transactional(Transactional.TxType.REQUIRES_NEW)
+    @Transactional
     public boolean removeUserInTeam(UUID teamUuid, UUID userToRemove){
         entityManager.joinTransaction();
 
         Team team = entityManager.find(Team.class,teamUuid);
         User u = entityManager.find(User.class,userToRemove);
-
-        boolean removed = team.getUsers().remove(u);
-
-//        entityManager.persist(team);
-        entityManager.merge(team);
+        boolean removed = u.getTeams().remove(team);
+        entityManager.persist(team);
         flushAndClear();
-
-//        Session session = sessionFactory.openSession();
-//        Transaction tx = session.beginTransaction();
-//        Team t = session.get(Team.class,teamUuid);
-//        assertNotNull(t);
-//        User u = session.get(User.class,userToRemove);
-//        assertNotNull(u);
-//        System.out.println("Length before "+ t.getUsers().size());
-//        boolean removed = t.getUsers().remove(u);
-//        System.out.println("Length after "+ t.getUsers().size());
-//        session.persist(t);
-//        session.flush();
-//        tx.commit();
-
         return removed;
     }
 
@@ -226,7 +209,10 @@ public class TeamDAO extends DAO<Team> {
                     team.setAdmin(Objects.equals(team.getAdminUuid(),userUuid));
                     toReturn.add(team);
                 }
-                if(!Objects.equals(user.getUuid(),userUuid)) team.getEmails().add(user.getEmail());
+                if(!Objects.equals(user.getUuid(),userUuid)){
+                    team.getEmails().add(user.getEmail());
+                    System.out.println("Team size : " + user.getTeams().size());
+                }
             }
 
         }
