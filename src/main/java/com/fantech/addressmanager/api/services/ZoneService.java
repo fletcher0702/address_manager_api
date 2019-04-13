@@ -15,10 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -29,10 +26,10 @@ public class ZoneService {
     private ZoneDAO zoneDAO;
     private TeamDAO teamDAO;
     private AddressHelper addressHelper;
-    private HashMap<String,Object> response = new HashMap<>();
+    private HashMap<String, Object> response = new HashMap<>();
 
     @Autowired
-    public ZoneService(UserDAO userDAO,ZoneDAO zoneDAO, TeamDAO teamDAO, AddressHelper addressHelper) {
+    public ZoneService(UserDAO userDAO, ZoneDAO zoneDAO, TeamDAO teamDAO, AddressHelper addressHelper) {
         this.userDAO = userDAO;
         this.zoneDAO = zoneDAO;
         this.teamDAO = teamDAO;
@@ -42,130 +39,143 @@ public class ZoneService {
     public Object createZone(CreateZoneDto createZoneDto) throws IOException {
 
         response.clear();
-        if (createZoneDto.getAddress() != null && createZoneDto.getName() != null && createZoneDto.getTeamUuid() != null && createZoneDto.getUserUuid()!=null) {
+        try {
 
-            System.out.println("All Credentials presents...");
-            System.out.println(createZoneDto.getTeamUuid());
-            Team team = teamDAO.findByUuid(UUID.fromString(createZoneDto.getTeamUuid()));
-            User user = userDAO.findByUuid(UUID.fromString(createZoneDto.getUserUuid()));
-            if (team != null && user !=null) {
-                System.out.println("Related Team found...");
+            if (createZoneDto.getAddress() != null && createZoneDto.getName() != null && createZoneDto.getTeamUuid() != null && createZoneDto.getUserUuid() != null) {
 
-                if(Objects.equals(team.getAdminUuid(),UUID.fromString(createZoneDto.getUserUuid()))){
+                System.out.println("All Credentials presents...");
+                System.out.println(createZoneDto.getTeamUuid());
+                Team team = teamDAO.findByUuid(UUID.fromString(createZoneDto.getTeamUuid()));
+                User user = userDAO.findByUuid(UUID.fromString(createZoneDto.getUserUuid()));
+                if (team != null && user != null) {
+                    System.out.println("Related Team found...");
 
-                    Zone zone = new Zone();
-                    Coordinates coordinates = addressHelper.getCoordinates(createZoneDto.getAddress());
-                    zone.setAdminUuid(UUID.fromString(createZoneDto.getUserUuid()));
-                    zone.setName(createZoneDto.getName());
-                    zone.setLatitude(coordinates.getLat());
-                    zone.setLongitude(coordinates.getLng());
-                    zone.setTeam(team);
-                    zoneDAO.create(zone);
+                    if (Objects.equals(team.getAdminUuid(), UUID.fromString(createZoneDto.getUserUuid()))) {
 
-                    response.put("created",true);
-                    response.put("content",zone);
-                    return response;
+                        Zone zone = new Zone();
+                        Coordinates coordinates = addressHelper.getCoordinates(createZoneDto.getAddress());
+                        zone.setAdminUuid(UUID.fromString(createZoneDto.getUserUuid()));
+                        zone.setName(createZoneDto.getName());
+                        zone.setLatitude(coordinates.getLat());
+                        zone.setLongitude(coordinates.getLng());
+                        zone.setTeam(team);
+                        zoneDAO.create(zone);
+
+                        response.put("created", true);
+                        response.put("content", zone);
+
+                    }
+
                 }
-
-            }
-            System.out.println("Related user not found...");
+                System.out.println("Related user not found...");
+            } else response.put("created", false);
+            return response;
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.put("created", false);
+            return response;
         }
-
-        response.put("created",false);
-        return response;
     }
 
-    public List findAll(String userUuid){
+    public Object updateZone(UpdateZoneDto zoneDto) {
 
-        return  zoneDAO.findAll();
-    }
-
-    public Object updateZone(UpdateZoneDto zoneDto){
-
-        HashMap<String,Object> res = new HashMap<>();
-        try{
+        HashMap<String, Object> res = new HashMap<>();
+        try {
             assertNotNull(zoneDto);
             assertNotNull(zoneDto.getUserUuid());
             assertNotNull(zoneDto.getTeamUuid());
             assertNotNull(zoneDto.getName());
 
-            Zone zone = zoneDAO.findZoneByTeamUuid(UUID.fromString(zoneDto.getTeamUuid()),UUID.fromString(zoneDto.getZoneUuid()));
+            Zone zone = zoneDAO.findZoneByTeamUuid(UUID.fromString(zoneDto.getTeamUuid()), UUID.fromString(zoneDto.getZoneUuid()));
             assertNotNull(zone);
 
-            if(Objects.equals(zone.getAdminUuid(),UUID.fromString(zoneDto.getUserUuid()))){
+            if (Objects.equals(zone.getAdminUuid(), UUID.fromString(zoneDto.getUserUuid()))) {
                 Coordinates coordinates = null;
-                if(zoneDto.getAddress()!=null){
+                if (zoneDto.getAddress() != null) {
                     coordinates = addressHelper.getCoordinates(zoneDto.getAddress());
                 }
 
-                res.put("updated", zoneDAO.updateZone(zone.getUuid(),zoneDto,coordinates));
+                res.put("updated", zoneDAO.updateZone(zone.getUuid(), zoneDto, coordinates));
                 return res;
             }
 
-            res.put("updated",false);
+            res.put("updated", false);
 
             return res;
 
 
-        }catch(Exception e){
-            res.put("message","invalid credentials or non existing zone");
-            res.put("updated",false);
+        } catch (Exception e) {
+            res.put("message", "invalid credentials or non existing zone");
+            res.put("updated", false);
             return res;
         }
     }
 
-    public List findAllByUserUuid(String teamUuid){
+    public List findAllByUserUuid(String teamUuid) {
 
-        Team team = teamDAO.findByUuid(UUID.fromString(teamUuid));
+        try{
 
-        if(team!=null){
+            Team team = teamDAO.findByUuid(UUID.fromString(teamUuid));
+            assertNotNull(team);
             System.out.println("Team found, looking for zones...");
             return zoneDAO.findAllByUserUuid(UUID.fromString(teamUuid));
+
+        }catch (Exception e){
+            System.out.println("Zone(s) not found...");
+            e.printStackTrace();
+            return new ArrayList();
         }
 
-        System.out.println("Zone(s) not found...");
-        return null;
     }
 
-    public Zone findUserZoneByUuid(String userUuid, String zoneUuid){
+    public Zone findUserZoneByUuid(String userUuid, String zoneUuid) {
 
-        Team team = teamDAO.findByUuid(UUID.fromString(userUuid));
-
-        if(team!=null){
-
+        try{
+            Team team = teamDAO.findByUuid(UUID.fromString(userUuid));
+            assertNotNull(team);
+            System.out.println("User not found...");
             return zoneDAO.findUserZoneByUuid(team.getUuid(), UUID.fromString(zoneUuid));
+        }catch (Exception e){
+            e.printStackTrace();
+            return null;
         }
-        System.out.println("User not found...");
-        return null;
     }
 
-    public Object deleteByUuid(DeleteZoneDto zoneDto){
-        assertNotNull(zoneDto.getUserUuid());
-        assertNotNull(zoneDto.getZoneUuid());
-        assertNotNull(zoneDto.getTeamUuid());
+    public Object deleteByUuid(DeleteZoneDto zoneDto) {
 
-        response.clear();
-        Team team  = teamDAO.findByUuid(UUID.fromString(zoneDto.getTeamUuid()));
-        assertNotNull(team);
 
-        Zone z = zoneDAO.findByUuid(UUID.fromString(zoneDto.getZoneUuid()));
+        try{
+            assertNotNull(zoneDto.getUserUuid());
+            assertNotNull(zoneDto.getZoneUuid());
+            assertNotNull(zoneDto.getTeamUuid());
 
-        assertNotNull(z);
+            response.clear();
+            Team team = teamDAO.findByUuid(UUID.fromString(zoneDto.getTeamUuid()));
+            assertNotNull(team);
 
-        for(Zone zone : team.getZones()){
+            Zone z = zoneDAO.findByUuid(UUID.fromString(zoneDto.getZoneUuid()));
 
-            if(Objects.equals(zone.getUuid(),z.getUuid())){
+            assertNotNull(z);
 
-                if(Objects.equals(z.getAdminUuid(),UUID.fromString(zoneDto.getUserUuid()))){
+            for (Zone zone : team.getZones()) {
 
-                    response.put("deleted",zoneDAO.delete(z));
-                    return response;
+                if (Objects.equals(zone.getUuid(), z.getUuid())) {
+
+                    if (Objects.equals(z.getAdminUuid(), UUID.fromString(zoneDto.getUserUuid()))) {
+
+                        response.put("deleted", zoneDAO.delete(z));
+                        return response;
+                    }
+
                 }
-
             }
+        }catch (Exception e){
+            e.printStackTrace();
+            response.put("deleted", false);
+            return response;
         }
 
-        response.put("deleted",false);
+        response.put("deleted", false);
         return response;
     }
 }
