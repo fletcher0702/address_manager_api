@@ -47,19 +47,29 @@ public class UserService {
     public Map login(UserDto user) {
 
         HashMap<String, Boolean> response = new HashMap<>();
-        if(user.getEmail()!=null && user.getPassword()!=null){
-            User userFound = userDAO.findByEmail(user.getEmail());
 
-            if (userFound != null) {
-                boolean match = authService.passwordMatch(user.getPassword(), userFound.getPassword());
-                if (match) return authService.jwtClaim(userFound.getUuid().toString());
+        try{
+
+            if(user.getEmail()!=null && user.getPassword()!=null){
+                User userFound = userDAO.findByEmail(user.getEmail());
+
+                if (userFound != null) {
+                    boolean match = authService.passwordMatch(user.getPassword(), userFound.getPassword());
+                    if (match) return authService.jwtClaim(userFound.getUuid().toString());
+                }
+            }else {
+
+                response.put("created", false);
+
             }
-        }else {
+            return response;
 
+        }catch (Exception e){
+            e.printStackTrace();
             response.put("created", false);
-
+            return response;
         }
-        return response;
+
     }
 
     @ResponseStatus(value = HttpStatus.FORBIDDEN, reason = "Invalid token")
@@ -67,28 +77,30 @@ public class UserService {
 
         String token = authService.getToken(headers);
         HashMap<String, Object> res = new HashMap<>();
-        if(!token.isEmpty()){
+        try{
 
-            try{
-                res = authService.decodeJwt(token);
-                if((boolean)res.get("valid")){
-                    User u = userDAO.findByUuid(UUID.fromString((String) res.get("uuid")));
-                    if(u!=null){
+            if(!token.isEmpty()){
+                    res = authService.decodeJwt(token);
+                    if((boolean)res.get("valid")){
+                        User u = userDAO.findByUuid(UUID.fromString((String) res.get("uuid")));
+                        if(u!=null){
 
-                        res.putIfAbsent("valid",true);
-                    }else{
-                        res.putIfAbsent("valid",false);
-                    }
-                }
-                return res;
-            }catch(Exception e){
-                res.put("valid", false);
-                e.printStackTrace();
-                return res;
+                            res.putIfAbsent("valid",true);
+                        }else{
+                            res.putIfAbsent("valid",false);
+                        }
+                    }else res.putIfAbsent("valid",false);
+
             }
+            return res;
+
+        }catch (Exception e){
+            e.printStackTrace();
+            res.put("valid", false);
+            res.put("message", "401 Unauthorized");
+            return res;
         }
-        res.put("message", "401 Unauthorized");
-        return res;
+
     }
 
     public List findAll(){

@@ -23,7 +23,7 @@ public class TeamService {
 
     private UserDAO userDAO;
     private TeamDAO teamDAO;
-    private HashMap<String,Object> response = new HashMap<>();
+    private HashMap<String, Object> response = new HashMap<>();
 
     @Autowired
     public TeamService(UserDAO userDAO, TeamDAO teamDAO) {
@@ -34,18 +34,29 @@ public class TeamService {
     public Object createTeam(TeamDto teamDto) {
 
         response.clear();
-        if (!teamDto.getAdminUuid().isEmpty() && !teamDto.getName().isEmpty()) {
+        try{
 
-            User user = userDAO.findByUuid(UUID.fromString(teamDto.getAdminUuid()));
-            if (user != null) {
+            if (!teamDto.getAdminUuid().isEmpty() && !teamDto.getName().isEmpty()) {
 
-                // TODO : findOneByName before saving
+                User user = userDAO.findByUuid(UUID.fromString(teamDto.getAdminUuid()));
+                if (user != null) {
 
-                response.put("created",true);
-                response.put("content",teamDAO.createOne(user.getUuid(),teamDto));
-                return response;
+                    // TODO : findOneByName before saving
+
+                    response.put("created", true);
+                    response.put("content", teamDAO.createOne(user.getUuid(), teamDto));
+                    return response;
+
+                }
 
             }
+
+        }catch (Exception e){
+            e.printStackTrace();
+            response.put("created", false);
+            response.put("message", "Something went wrong");
+
+            return response;
 
         }
 
@@ -62,41 +73,48 @@ public class TeamService {
     public Object addUsersInTeam(InviteUsersDto inviteUsersDto) {
 
 
+        response.clear();
         // Check if we have users
-        if (inviteUsersDto.getEmails().size() > 0) {
-            Team team = teamDAO.findByUuid(UUID.fromString(inviteUsersDto.getTeamUuid()));
+        try{
+            if (inviteUsersDto.getEmails().size() > 0) {
+                Team team = teamDAO.findByUuid(UUID.fromString(inviteUsersDto.getTeamUuid()));
 
-            // Check if the request is made by the owner of the team
-            if (Objects.equals(team.getAdminUuid(), UUID.fromString(inviteUsersDto.getUserUuid()))) {
-                List<String> created = new ArrayList<>();
-                HashMap<String, Object> res = new HashMap<>();
-                ArrayList<UUID> usersUuid = new ArrayList<>();
-                for (String email : inviteUsersDto.getEmails()) {
-                    User user = userDAO.findByEmail(email);
+                // Check if the request is made by the owner of the team
+                if (Objects.equals(team.getAdminUuid(), UUID.fromString(inviteUsersDto.getUserUuid()))) {
+                    List<String> created = new ArrayList<>();
+                    HashMap<String, Object> res = new HashMap<>();
+                    ArrayList<UUID> usersUuid = new ArrayList<>();
+                    for (String email : inviteUsersDto.getEmails()) {
+                        User user = userDAO.findByEmail(email);
 
-                    if (user != null) {
+                        if (user != null) {
 
-                        usersUuid.add(user.getUuid());
-                        created.add(email);
+                            usersUuid.add(user.getUuid());
+                            created.add(email);
+                        }
+
                     }
+                    teamDAO.addUserInTeam(team.getUuid(), usersUuid);
 
+                    res.put("email", created);
+
+                    return res;
                 }
-                teamDAO.addUserInTeam(team.getUuid(),usersUuid);
-
-                res.put("email", created);
-
-                return res;
             }
+        }catch (Exception e){
+            e.printStackTrace();
+            response.put("error", "Something went wrong");
+            return response;
         }
-
-        return null;
+        response.put("error", "Enter some email(s)");
+        return response;
     }
 
-    public Object removeUserInTeam(UninviteUserDto uninviteUserDto){
+    public Object removeUserInTeam(UninviteUserDto uninviteUserDto) {
 
         response.clear();
 
-        try{
+        try {
             assertNotNull(uninviteUserDto);
             assertNotNull(uninviteUserDto.getEmail());
             assertNotNull(uninviteUserDto.getTeamUuid());
@@ -109,143 +127,188 @@ public class TeamService {
 
             UUID userUuid = UUID.fromString(uninviteUserDto.getUserUuid());
 
-            if(Objects.equals(t.getAdminUuid(),userUuid)){
+            if (Objects.equals(t.getAdminUuid(), userUuid)) {
 
                 User toRemove = userDAO.findByEmail(uninviteUserDto.getEmail());
                 assertNotNull(toRemove);
 
                 System.out.println("User to delete found...");
 
-                response.put("present",teamDAO.removeUserInTeam(t.getUuid(),toRemove.getUuid()));
+                response.put("present", teamDAO.removeUserInTeam(t.getUuid(), toRemove.getUuid()));
 
 
                 return response;
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
-            response.put("present",false);
+            response.put("present", false);
             return response;
         }
 
-        response.put("present",false);
+        response.put("present", false);
 
         return response;
     }
 
-    public Object findAllTeamByUserUuid(String userUuid){
+    public Object findAllTeamByUserUuid(String userUuid) {
 
-        return teamDAO.findUserRelatedTeam(UUID.fromString(userUuid));
-    }
-
-    public Object deleteByUuid(DeleteTeamDto teamDto){
-
-        assertNotNull(teamDto.getTeamUuid());
-        assertNotNull(teamDto.getUserUuid());
-
-        Team t = teamDAO.findByUuid(UUID.fromString(teamDto.getTeamUuid()));
-        response.clear();
-        assertNotNull(t);
-
-        if(Objects.equals(t.getAdminUuid(),UUID.fromString(teamDto.getUserUuid()))){
-
-            teamDAO.delete(t);
-            response.put("deleted",true);
+        try {
+            return teamDAO.findUserRelatedTeam(UUID.fromString(userUuid));
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.clear();
+            response.put("error", "Something went wrong");
             return response;
         }
-        response.put("deleted",false);
-        return response;
     }
 
-    public Object createStatus(CreateStatusDto statusDto){
-
-        assertNotNull(statusDto.getUserUuid());
-        assertNotNull(statusDto.getTeamUuid());
-        assertNotNull(statusDto.getStatus());
-        response.clear();
-        Team t = teamDAO.findByUuid(UUID.fromString(statusDto.getTeamUuid()));
-        assertNotNull(t);
+    public Object deleteByUuid(DeleteTeamDto teamDto) {
 
 
-        if(Objects.equals(t.getAdminUuid(),UUID.fromString(statusDto.getUserUuid()))){
+        try {
+            assertNotNull(teamDto.getTeamUuid());
+            assertNotNull(teamDto.getUserUuid());
 
-            response.put("created",teamDAO.addStatus(t.getUuid(),statusDto.getStatus()));
+            Team t = teamDAO.findByUuid(UUID.fromString(teamDto.getTeamUuid()));
+            response.clear();
+            assertNotNull(t);
+
+            if (Objects.equals(t.getAdminUuid(), UUID.fromString(teamDto.getUserUuid()))) {
+
+                teamDAO.delete(t);
+                response.put("deleted", true);
+
+            } else {
+                response.put("deleted", false);
+            }
+            return response;
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.put("deleted", false);
             return response;
         }
-        response.put("created",false);
-        return response;
+
+    }
+
+    public Object createStatus(CreateStatusDto statusDto) {
+
+        try {
+
+            assertNotNull(statusDto.getUserUuid());
+            assertNotNull(statusDto.getTeamUuid());
+            assertNotNull(statusDto.getStatus());
+            response.clear();
+            Team t = teamDAO.findByUuid(UUID.fromString(statusDto.getTeamUuid()));
+            assertNotNull(t);
+
+
+            if (Objects.equals(t.getAdminUuid(), UUID.fromString(statusDto.getUserUuid()))) {
+
+                response.put("created", teamDAO.addStatus(t.getUuid(), statusDto.getStatus()));
+
+            } else response.put("created", false);
+            return response;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.put("created", false);
+            return response;
+        }
+
     }
 
 
     public Object deleteStatus(DeleteStatusDto statusDto) {
 
-        assertNotNull(statusDto.getUserUuid());
-        assertNotNull(statusDto.getTeamUuid());
-        assertNotNull(statusDto.getStatusUuid());
+        try {
+            assertNotNull(statusDto.getUserUuid());
+            assertNotNull(statusDto.getTeamUuid());
+            assertNotNull(statusDto.getStatusUuid());
 
-        UUID teamUuid = UUID.fromString(statusDto.getTeamUuid());
-        Team team = teamDAO.findByUuid(teamUuid);
-        response.clear();
+            UUID teamUuid = UUID.fromString(statusDto.getTeamUuid());
+            Team team = teamDAO.findByUuid(teamUuid);
+            response.clear();
 
-        assertNotNull(team);
+            assertNotNull(team);
 
-        if(Objects.equals(team.getAdminUuid(),UUID.fromString(statusDto.getUserUuid()))){
+            if (Objects.equals(team.getAdminUuid(), UUID.fromString(statusDto.getUserUuid()))) {
 
-            response.put("deleted",teamDAO.deleteStatus(teamUuid,UUID.fromString(statusDto.getStatusUuid())));
+                response.put("deleted", teamDAO.deleteStatus(teamUuid, UUID.fromString(statusDto.getStatusUuid())));
+
+            } else response.put("deleted", false);
+
+            return response;
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.put("deleted", false);
             return response;
         }
 
-        response.put("deleted",false);
-        return response;
     }
 
 
-    public Object updateStatus(UpdateStatusDto statusDto){
+    public Object updateStatus(UpdateStatusDto statusDto) {
 
-        assertNotNull(statusDto);
-        assertNotNull(statusDto.getUserUuid());
-        assertNotNull(statusDto.getTeamUuid());
-        assertNotNull(statusDto.getStatusUuid());
-        assertNotNull(statusDto.getStatus());
 
-        response.clear();
-        UUID teamUuid = UUID.fromString(statusDto.getTeamUuid());
+        try {
+            assertNotNull(statusDto);
+            assertNotNull(statusDto.getUserUuid());
+            assertNotNull(statusDto.getTeamUuid());
+            assertNotNull(statusDto.getStatusUuid());
+            assertNotNull(statusDto.getStatus());
 
-        Team team = teamDAO.findByUuid(teamUuid);
+            response.clear();
+            UUID teamUuid = UUID.fromString(statusDto.getTeamUuid());
 
-        assertNotNull(team);
+            Team team = teamDAO.findByUuid(teamUuid);
 
-        if(Objects.equals(team.getAdminUuid(),UUID.fromString(statusDto.getUserUuid()))){
+            assertNotNull(team);
 
-            Status status = teamDAO.findStatusByUuid(teamUuid,UUID.fromString(statusDto.getStatusUuid()));
+            if (Objects.equals(team.getAdminUuid(), UUID.fromString(statusDto.getUserUuid()))) {
 
-            assertNotNull(status);
-            response.put("updated",teamDAO.updateStatus(status.getUuid(),statusDto.getStatus()));
+                Status status = teamDAO.findStatusByUuid(teamUuid, UUID.fromString(statusDto.getStatusUuid()));
+
+                assertNotNull(status);
+                response.put("updated", teamDAO.updateStatus(status.getUuid(), statusDto.getStatus()));
+
+            } else response.put("updated", false);
+
+            return response;
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.put("updated", false);
             return response;
         }
 
-        response.put("updated", false);
-        return response;
+
     }
 
-    public Object updateTeam(UpdateTeamDto teamDto){
+    public Object updateTeam(UpdateTeamDto teamDto) {
 
-        assertNotNull(teamDto);
-        assertNotNull(teamDto.getName());
-        assertNotNull(teamDto.getTeamUuid());
-        assertNotNull(teamDto.getUserUuid());
 
-        response.clear();
+        try {
 
-        Team team = teamDAO.findByUuid(UUID.fromString(teamDto.getTeamUuid()));
+            assertNotNull(teamDto);
+            assertNotNull(teamDto.getName());
+            assertNotNull(teamDto.getTeamUuid());
+            assertNotNull(teamDto.getUserUuid());
 
-        assertNotNull(team);
+            response.clear();
 
-        UUID userUuid = UUID.fromString(teamDto.getUserUuid());
-        if(Objects.equals(team.getAdminUuid(),userUuid)){
-            response.put("updated",teamDAO.updateTeam(team.getUuid(),teamDto));
+            Team team = teamDAO.findByUuid(UUID.fromString(teamDto.getTeamUuid()));
+
+            assertNotNull(team);
+
+            UUID userUuid = UUID.fromString(teamDto.getUserUuid());
+            if (Objects.equals(team.getAdminUuid(), userUuid)) {
+                response.put("updated", teamDAO.updateTeam(team.getUuid(), teamDto));
+
+            } else response.put("updated", false);
+            return response;
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.put("updated", false);
             return response;
         }
-        response.put("updated",false);
-        return response;
     }
 }

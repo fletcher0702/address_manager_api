@@ -203,7 +203,6 @@ public class TeamDAO extends DAO<Team> {
         List<Team> toReturn = new ArrayList<>();
 
         for (Team team : res) {
-            System.out.println("Team users length : " + team.getUsers().size());
             for (User user : team.getUsers()) {
                 if (Objects.equals(user.getUuid(), userUuid)){
                     team.setAdmin(Objects.equals(team.getAdminUuid(),userUuid));
@@ -211,10 +210,8 @@ public class TeamDAO extends DAO<Team> {
                 }
                 if(!Objects.equals(user.getUuid(),userUuid)){
                     team.getEmails().add(user.getEmail());
-                    System.out.println("Team size : " + user.getTeams().size());
                 }
             }
-
         }
 
         return toReturn;
