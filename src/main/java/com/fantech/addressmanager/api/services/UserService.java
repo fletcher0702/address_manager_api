@@ -1,6 +1,7 @@
 package com.fantech.addressmanager.api.services;
 
 import com.fantech.addressmanager.api.dao.UserDAO;
+import com.fantech.addressmanager.api.dto.UserPasswordUpdateDto;
 import com.fantech.addressmanager.api.dto.user.UserDto;
 import com.fantech.addressmanager.api.entity.User;
 import com.fantech.addressmanager.api.helpers.AuthService;
@@ -12,16 +13,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @Component
 
 public class UserService {
     private UserDAO userDAO;
     private AuthService authService;
+    private HashMap<String,Object> response = new HashMap<>();
 
     @Autowired
     @Lazy
@@ -122,5 +123,35 @@ public class UserService {
         res.put("exist",false);
 
         return res;
+    }
+
+    public Object updatePassword(UserPasswordUpdateDto userPasswordUpdateDto){
+
+        try {
+
+            response.clear();
+            assertNotNull(userPasswordUpdateDto);
+            assertNotNull(userPasswordUpdateDto.getUserUuid());
+            assertNotNull(userPasswordUpdateDto.getOldPassword());
+            assertNotNull(userPasswordUpdateDto.getNewPassword());
+
+            User u = userDAO.findByUuid(UUID.fromString(userPasswordUpdateDto.getUserUuid()));
+
+            assertNotNull(u);
+            System.out.println("User found...continue...");
+            if(authService.passwordMatch(userPasswordUpdateDto.getOldPassword(),u.getPassword()) && !userPasswordUpdateDto.getNewPassword().isEmpty()){
+
+                System.out.println("Password match...");
+                response.put("updated", userDAO.updateUserPassword(u.getUuid(),AuthService.hashPassword(userPasswordUpdateDto.getNewPassword())));
+
+            }else response.put("updated", false);
+
+            return response;
+
+        }catch (Exception e){
+            e.printStackTrace();
+            response.put("updated", false);
+            return response;
+        }
     }
 }
