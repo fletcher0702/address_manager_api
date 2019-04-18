@@ -1,5 +1,6 @@
 package com.fantech.addressmanager.api.controller;
 
+import com.fantech.addressmanager.api.dto.UserPasswordUpdateDto;
 import com.fantech.addressmanager.api.dto.user.UserDto;
 import com.fantech.addressmanager.api.services.UserService;
 
@@ -40,6 +41,11 @@ public class UserController {
     @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE)
     public Map login(@RequestBody UserDto user) {
         return userService.login(user);
+    }
+
+    @PatchMapping(value = "/password/update", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public Object passwordUpdate(@RequestBody UserPasswordUpdateDto userPasswordUpdateDto) {
+        return userService.updatePassword(userPasswordUpdateDto);
     }
 
     @GetMapping("/checktoken")

@@ -74,6 +74,19 @@ public class UserDAO extends DAO<User> {
 
     }
 
+    @Transactional
+    public boolean updateUserPassword(UUID userUuid,String password){
+
+        entityManager.joinTransaction();
+        User u = entityManager.find(User.class,userUuid);
+
+        u.setPassword(password);
+
+        entityManager.persist(u);
+        flushAndClear();
+        return true;
+    }
+
     private User getUser(Query q) {
         return (User) q.uniqueResult();
     }
