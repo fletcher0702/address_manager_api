@@ -53,10 +53,4 @@ public class UserController {
         return userService.checkJwtIntegrity(headers);
     }
 
-    @GetMapping("")
-    public List findAll(){
-        return userService.findAll();
-    }
-
-
 }
