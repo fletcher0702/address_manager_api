@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
+@Transactional
 public class UserDAO extends DAO<User> {
 
     @Autowired

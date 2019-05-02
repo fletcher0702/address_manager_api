@@ -28,6 +28,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @Repository
+@Transactional
 public class TeamDAO extends DAO<Team> {
 
     private ZoneDAO zoneDAO;
@@ -213,6 +214,7 @@ public class TeamDAO extends DAO<Team> {
                 }
             }
         }
+        session.close();
 
         return toReturn;
     }

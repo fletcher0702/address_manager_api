@@ -21,6 +21,7 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @Repository
+@Transactional
 public class ZoneDAO extends DAO<Zone> {
 
     @Autowired
