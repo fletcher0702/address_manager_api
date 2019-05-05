@@ -7,11 +7,9 @@ import com.fantech.addressmanager.api.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -51,6 +49,11 @@ public class UserController {
     @GetMapping("/checktoken")
     public Object checkJwtIntegrity(@RequestHeader HttpHeaders headers){
         return userService.checkJwtIntegrity(headers);
+    }
+
+    @DeleteMapping("/{uuid}/delete")
+    public Object deleteUserAccount(@PathVariable("uuid") String userUuid){
+        return userService.deleteUserAccount(userUuid);
     }
 
 }
