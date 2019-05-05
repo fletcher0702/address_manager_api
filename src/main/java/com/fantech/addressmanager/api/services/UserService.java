@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import javax.transaction.Transactional;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -152,6 +153,37 @@ public class UserService {
             e.printStackTrace();
             response.put("updated", false);
             return response;
+        }
+    }
+
+    @Transactional
+    public Object deleteUserAccount(String userUuid){
+
+        response.clear();
+
+        try{
+            System.out.println("UserUuid : "+ userUuid);
+            assertNotNull(userUuid);
+            if(userUuid.isEmpty()) {
+                response.put("message","Enter user UUID");
+                return response;
+            }
+
+            User u = userDAO.findByUuid(UUID.fromString(userUuid));
+
+            System.out.println("UUID : " + u.getUuid());
+            assertNotNull(u);
+            response.put("deleted", userDAO.delete(u));
+
+            return response;
+
+        }catch (Exception e){
+
+            response.put("message","Error something went wring when deleting the account");
+            e.printStackTrace();
+
+            return response;
+
         }
     }
 }

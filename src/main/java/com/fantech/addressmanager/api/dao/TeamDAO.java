@@ -62,32 +62,32 @@ public class TeamDAO extends DAO<Team> {
 
     }
 
-    @Transactional
+    @Transactional(Transactional.TxType.REQUIRES_NEW)
     @Override
-    public boolean delete(Team t) {
+    public boolean delete(Team team) {
 
         entityManager.joinTransaction();
-        assertNotNull(t);
-        Team td = entityManager.find(Team.class,t.getUuid());
+        assertNotNull(team);
+        Team teamToDeleteCandidate = entityManager.find(Team.class,team.getUuid());
 
         entityManager
                 .createNativeQuery("delete from user_team where team_uuid = :teamUuid")
-                .setParameter("teamUuid", t.getUuid())
+                .setParameter("teamUuid", team.getUuid())
                 .executeUpdate();
 
 
-        for(Zone zone : td.getZones()){
+        for(Zone zone : teamToDeleteCandidate.getZones()){
             zoneDAO.delete(zone);
         }
 
-        td.getUsers().clear();
-        td.getStatus().clear();
-        entityManager.persist(td);
+        teamToDeleteCandidate.getUsers().clear();
+        teamToDeleteCandidate.getStatus().clear();
+        entityManager.persist(teamToDeleteCandidate);
         entityManager.flush();
 
         entityManager
                 .createNativeQuery("delete from team where uuid = :teamUuid")
-                .setParameter("teamUuid", t.getUuid())
+                .setParameter("teamUuid", team.getUuid())
                 .executeUpdate();
 
 
